@@ -147,6 +147,19 @@ where
             },
         }
     }
+
+    pub fn read_flags(&self) -> super::Flags {
+        self.uart.read_flags()
+    }
+    pub fn clear_flags(&mut self, flags: super::Flags) {
+        self.uart.clear_flags(flags)
+    }
+    pub fn read_status(&self) -> super::Status {
+        self.uart.read_status()
+    }
+    pub fn clear_status(&mut self, status: super::Status) {
+        self.uart.clear_status(status)
+    }
 }
 
 impl<C, D> UartFuture<C, D, NoneT, NoneT>
