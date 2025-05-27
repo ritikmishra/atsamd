@@ -464,6 +464,7 @@ mod dma {
             let uart_ptr = self.uart.sercom_ptr();
 
             read_dma::<_, _, S>(&mut self.uart.rx_channel, uart_ptr, &mut words).await?;
+            self.uart.read_status().check_bus_error()?;
             Ok(())
         }
     }
