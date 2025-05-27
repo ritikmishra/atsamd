@@ -45,7 +45,7 @@ use pac::dmac::channel::{chprilvl::ChprilvlSpec, Chprilvl};
 // RegisterBlock
 //==============================================================================
 /// Read/write proxy for DMAC registers accessible to individual channels.
-pub(super) trait Register<Id: ChId> {
+pub trait Register<Id: ChId> {
     /// Get a shared reference to the underlying PAC object
     fn dmac(&self) -> &Dmac;
 
@@ -110,7 +110,7 @@ macro_rules! reg_proxy {
     (@new $reg:ident) => {
         paste! {
             /// Register proxy tied to a specific channel
-            pub(super) struct [< $reg:camel Proxy >]<Id: ChId, REG> {
+            pub struct [< $reg:camel Proxy >]<Id: ChId, REG> {
                 #[allow(unused)]
                 dmac: Dmac,
                 _id: PhantomData<Id>,
@@ -281,7 +281,7 @@ reg_proxy!(swtrigctrl, bit, rw);
 /// any ongoing transfers for the channel which it represents.
 #[allow(dead_code)]
 #[hal_macro_helper]
-pub(super) struct RegisterBlock<Id: ChId> {
+pub struct RegisterBlock<Id: ChId> {
     pub chctrla: ChctrlaProxy<Id, Chctrla>,
     pub chctrlb: ChctrlbProxy<Id, Chctrlb>,
     pub chintenclr: ChintenclrProxy<Id, Chintenclr>,
@@ -298,7 +298,7 @@ pub(super) struct RegisterBlock<Id: ChId> {
 
 impl<Id: ChId> RegisterBlock<Id> {
     #[hal_macro_helper]
-    pub(super) fn new(_id: PhantomData<Id>) -> Self {
+    pub fn new(_id: PhantomData<Id>) -> Self {
         Self {
             chctrla: ChctrlaProxy::new(),
             chctrlb: ChctrlbProxy::new(),
