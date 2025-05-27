@@ -359,7 +359,7 @@ macro_rules! get {
 pub const NUM_CHANNELS: usize = with_num_channels!(get);
 
 /// DMAC SRAM registers
-pub(crate) mod sram {
+pub mod sram {
     #![allow(dead_code, unused_braces)]
 
     use core::cell::UnsafeCell;
@@ -405,18 +405,18 @@ pub(crate) mod sram {
     #[bitfield]
     #[derive(Clone, Copy)]
     #[repr(u16)]
-    pub(super) struct BlockTransferControl {
-        pub(super) valid: bool,
-        pub(super) evosel: B2,
-        pub(super) blockact: B2,
+    pub struct BlockTransferControl {
+        pub valid: bool,
+        pub evosel: B2,
+        pub blockact: B2,
         #[skip]
         _reserved: B3,
         #[bits = 2]
-        pub(super) beatsize: BeatSize,
-        pub(super) srcinc: bool,
-        pub(super) dstinc: bool,
-        pub(super) stepsel: bool,
-        pub(super) stepsize: B3,
+        pub beatsize: BeatSize,
+        pub srcinc: bool,
+        pub dstinc: bool,
+        pub stepsel: bool,
+        pub stepsize: B3,
     }
 
     impl Default for BlockTransferControl {
@@ -429,11 +429,11 @@ pub(crate) mod sram {
     #[derive(Clone, Copy)]
     #[repr(C, align(16))]
     pub struct DmacDescriptor {
-        pub(super) btctrl: BlockTransferControl,
-        pub(super) btcnt: u16,
-        pub(super) srcaddr: *const (),
-        pub(super) dstaddr: *const (),
-        pub(super) descaddr: *const DmacDescriptor,
+        pub btctrl: BlockTransferControl,
+        pub btcnt: u16,
+        pub srcaddr: *const (),
+        pub dstaddr: *const (),
+        pub descaddr: *const DmacDescriptor,
     }
 
     impl DmacDescriptor {
@@ -471,7 +471,7 @@ pub(crate) mod sram {
         [const { DescriptorCell::default() }; NUM_CHANNELS];
 
     // We only ever need to know its starting address.
-    pub(super) fn writeback_addr() -> *mut DmacDescriptor {
+    pub fn writeback_addr() -> *mut DmacDescriptor {
         WRITEBACK[0].get()
     }
 
@@ -488,7 +488,7 @@ pub(crate) mod sram {
         [const { DescriptorCell::default() }; NUM_CHANNELS];
 
     #[inline]
-    pub(super) fn descriptor_section_addr() -> *mut DmacDescriptor {
+    pub fn descriptor_section_addr() -> *mut DmacDescriptor {
         DESCRIPTOR_SECTION[0].get()
     }
 
@@ -505,7 +505,7 @@ pub(crate) mod sram {
     /// references) to the pointee *at any given time*, as it would be
     /// instantaneous undefined behaviour.
     #[inline]
-    pub(super) unsafe fn get_descriptor(channel_id: usize) -> *mut DmacDescriptor {
+    pub unsafe fn get_descriptor(channel_id: usize) -> *mut DmacDescriptor {
         DESCRIPTOR_SECTION[channel_id].get()
     }
 }
@@ -525,6 +525,6 @@ mod waker {
 
     #[allow(clippy::declare_interior_mutable_const)]
     const NEW_WAKER: AtomicWaker = AtomicWaker::new();
-    pub(super) static WAKERS: [AtomicWaker; with_num_channels!(get)] =
+    pub static WAKERS: [AtomicWaker; with_num_channels!(get)] =
         [NEW_WAKER; with_num_channels!(get)];
 }

@@ -47,7 +47,7 @@ use super::{
 use crate::typelevel::{Is, Sealed};
 use modular_bitfield::prelude::*;
 
-mod reg;
+pub mod reg;
 use reg::RegisterBlock;
 
 #[hal_cfg("dmac-d5x")]
@@ -308,11 +308,15 @@ impl<Id: ChId, S: Status> Channel<Id, S> {
         success.then_some(()).ok_or(Error::TransferError)
     }
 
+    #[inline]
+    pub unsafe fn regs_mut(&mut self) -> &mut RegisterBlock<Id> {
+        &mut self.regs
+    }
     /// Return a mutable reference to the DMAC descriptor that belongs to this
     /// channel. In the case of linked transfers, this will be the first
     /// descriptor in the chain.
     #[inline]
-    fn descriptor_mut(&mut self) -> &mut DmacDescriptor {
+    pub unsafe fn descriptor_mut(&mut self) -> &mut DmacDescriptor {
         // SAFETY this is only safe as long as we read/write to the descriptor
         // belonging to OUR channel. We assume this is the case, as there can only ever
         // exist one (safely created) instance of Self, and we're taking an exclusive
