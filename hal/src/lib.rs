@@ -22,6 +22,10 @@ pub use rtic_time;
 #[doc(hidden)]
 pub use embassy_time_driver;
 
+// Exposed for use from within the embassy time macro
+#[doc(hidden)]
+pub use critical_section;
+
 pub mod typelevel;
 mod util;
 

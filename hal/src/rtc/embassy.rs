@@ -134,14 +134,11 @@ use rtc_src::*;
 macro_rules! embassy_time {
     ($name: ident) => {
 
-        use $crate::pac::interrupt;
-        use $crate::{embassy_time_driver, rtc::embassy::{EmbassyBackend, EmbassyRtcSource}};
-
-        embassy_time_driver::time_driver_impl!(static DRIVER: EmbassyBackend = EmbassyBackend::new());
+        $crate::embassy_time_driver::time_driver_impl!(static DRIVER: $crate::rtc::embassy::EmbassyBackend = $crate::rtc::embassy::EmbassyBackend::new());
 
         #[$crate::pac::interrupt]
         fn RTC() {
-            critical_section::with(|cs| {
+            $crate::critical_section::with(|cs| {
                 let rtc = unsafe { $crate::pac::Rtc::steal() };
                 DRIVER.handle_interrupt(&rtc, cs)
             });
@@ -150,8 +147,12 @@ macro_rules! embassy_time {
         pub struct $name;
 
         impl $name {
-            unsafe fn init<SRC>(_rtc: SRC) where SRC: EmbassyRtcSource {
-                EmbassyBackend::init();
+            unsafe fn init<SRC>(_rtc: SRC)
+                where SRC: $crate::rtc::embassy::EmbassyRtcSource
+            {
+                unsafe {
+                    $crate::rtc::embassy::EmbassyBackend::init();
+                }
             }
         }
     }
