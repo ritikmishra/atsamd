@@ -30,9 +30,21 @@ impl EmbassyBackend {
     }
 
     fn set_alarm(&self, _cs: &CriticalSection, at: u64, rtc: &Rtc) -> bool {
-        // Embassy uses u64::MAX as a "no upcoming interrupt" sentinel
+        let t: u32 = RtcMode0::count(rtc);        
+        
         let at = match u32::try_from(at) {
-            Ok(at) => at,
+            Ok(at) => {
+                // Alarm needs to be in the future, otherwise it won't fire.
+                // one tick is ~3 microseconds, so 30 microseconds seems 
+                // like a good amonut of buffer.
+                // TODO: analysis or timing evidence is required to prove why 0x9 is a good buffer value
+                if at.saturating_sub(t) > 0x9 {
+                    at
+                } else {
+                    return false;
+                }
+            },
+            // Embassy uses u64::MAX as a "no upcoming interrupt" sentinel
             _ if at == u64::MAX => u32::MAX,
             Err(_) => return false,
         };
@@ -89,9 +101,10 @@ impl Driver for EmbassyBackend {
             let rtc = unsafe { Rtc::steal() };
             let mut queue = self.queue.borrow(cs).borrow_mut();
             if queue.schedule_wake(at, waker) {
-                let next = queue.next_expiration(self.now());
-                // We can only handle one alarm at a time right now
-                self.set_alarm(&cs, next, &rtc);
+                let mut next = queue.next_expiration(self.now());
+                while !self.set_alarm(&cs, next, &rtc) {
+                    next = queue.next_expiration(self.now());
+                }
             }
         });
     }
