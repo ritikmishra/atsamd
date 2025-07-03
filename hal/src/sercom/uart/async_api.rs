@@ -147,19 +147,6 @@ where
             },
         }
     }
-
-    pub fn read_flags(&self) -> super::Flags {
-        self.uart.read_flags()
-    }
-    pub fn clear_flags(&mut self, flags: super::Flags) {
-        self.uart.clear_flags(flags)
-    }
-    pub fn read_status(&self) -> super::Status {
-        self.uart.read_status()
-    }
-    pub fn clear_status(&mut self, status: super::Status) {
-        self.uart.clear_status(status)
-    }
 }
 
 impl<C, D> UartFuture<C, D, NoneT, NoneT>
@@ -187,6 +174,19 @@ where
     D: Capability,
     S: Sercom,
 {
+    pub fn read_flags(&self) -> super::Flags {
+        self.uart.read_flags()
+    }
+    pub fn clear_flags(&mut self, flags: super::Flags) {
+        self.uart.clear_flags(flags)
+    }
+    pub fn read_status(&self) -> super::Status {
+        self.uart.read_status()
+    }
+    pub fn clear_status(&mut self, status: super::Status) {
+        self.uart.clear_status(status)
+    }
+
     #[inline]
     async fn wait_flags(&mut self, flags_to_wait: Flags) {
         let flags_to_wait = flags_to_wait & Flags::from_bits_retain(D::FLAG_MASK);
