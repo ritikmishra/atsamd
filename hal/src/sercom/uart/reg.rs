@@ -5,6 +5,7 @@ use atsamd_hal_macros::hal_cfg;
 use super::{BaudMode, BitOrder, CharSizeEnum, Flags, Oversampling, Parity, Status, StopBits};
 
 use crate::pac;
+use crate::sercom::uart::SampleAdjustment;
 use crate::sercom::Sercom;
 
 #[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
@@ -214,6 +215,16 @@ impl<S: Sercom> Registers<S> {
     #[inline]
     pub(super) fn get_collision_detection(&self) -> bool {
         self.usart().ctrlb().read().colden().bit()
+    }
+
+    #[inline]
+    pub(super) fn get_sample_adjustment(&self) -> SampleAdjustment {
+        self.usart().ctrla().read().sampa().variant().into()
+    }
+
+    #[inline]
+    pub(super) fn set_sample_adjustment(&mut self, sampa: SampleAdjustment) {
+        self.usart().ctrla().modify(|_, w| w.sampa().variant(sampa.into()))
     }
 
     /// Set the baud rate

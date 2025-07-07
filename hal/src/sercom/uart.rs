@@ -592,6 +592,35 @@ pub enum Parity {
     Odd,
 }
 
+#[repr(u8)]
+pub enum SampleAdjustment {
+    FirstTriple,
+    SecondTriple,
+    ThirdTriple,
+    FourthTriple,
+}
+impl From<crate::pac::sercom0::usart_int::ctrla::Sampaselect> for SampleAdjustment {
+    fn from(value: crate::pac::sercom0::usart_int::ctrla::Sampaselect) -> Self {
+        match value {
+            crate::pac::sercom0::usart_int::ctrla::Sampaselect::Adj0 => Self::FirstTriple,
+            crate::pac::sercom0::usart_int::ctrla::Sampaselect::Adj1 => Self::SecondTriple,
+            crate::pac::sercom0::usart_int::ctrla::Sampaselect::Adj2 => Self::ThirdTriple,
+            crate::pac::sercom0::usart_int::ctrla::Sampaselect::Adj3 => Self::FourthTriple,
+        }
+    }
+}
+impl From<SampleAdjustment> for crate::pac::sercom0::usart_int::ctrla::Sampaselect {
+    fn from(value: SampleAdjustment) -> Self {
+        match value {
+            SampleAdjustment::FirstTriple => Self::Adj0,
+            SampleAdjustment::SecondTriple => Self::Adj1,
+            SampleAdjustment::ThirdTriple => Self::Adj2,
+            SampleAdjustment::FourthTriple => Self::Adj3,
+        }
+    }
+}
+
+
 /// Bit order of a UART frame
 #[repr(u8)]
 #[derive(Debug, Clone, Copy)]

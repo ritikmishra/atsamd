@@ -8,7 +8,7 @@ use super::{
 };
 use crate::{
     pac,
-    sercom::Sercom,
+    sercom::{uart::SampleAdjustment, Sercom},
     time::Hertz,
     typelevel::{Is, NoneT, Sealed},
 };
@@ -178,6 +178,22 @@ where
     pub fn parity(mut self, parity: Parity) -> Self {
         self.set_parity(parity);
         self
+    }
+
+    #[inline]
+    pub fn sample_adjustment(mut self, sampa: SampleAdjustment) -> Self {
+        self.set_sample_adjustment(sampa);
+        self
+    }
+
+    #[inline]
+    pub fn set_sample_adjustment(&mut self, sampa: SampleAdjustment) {
+        self.registers.set_sample_adjustment(sampa);
+    }
+
+    #[inline]
+    pub fn get_sample_adjustment(&self) -> SampleAdjustment {
+        self.registers.get_sample_adjustment()
     }
 
     /// Change the parity setting (setter version)
