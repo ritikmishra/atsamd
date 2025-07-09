@@ -218,7 +218,7 @@ pub trait RtcMode {
                 w
             });
             Self::sync(rtc);
-
+ 
             // Errata: The first read of the count is incorrect so we need to read it
             // then wait for it to change.
             Self::_wait_for_count_change(rtc);
@@ -393,16 +393,17 @@ pub mod mode0 {
         #[hal_macro_helper]
         fn set_compare(rtc: &Rtc, number: usize, value: Self::Count) {
             // SYNC: Write
+            Self::sync(rtc);
             unsafe {
                 rtc.mode0().comp(number).write(|w| w.comp().bits(value));
             }
-            Self::sync(rtc);
         }
 
         #[inline]
         #[cfg(any(feature = "rtic", feature = "embassy-time"))]
         fn get_compare(rtc: &Rtc, number: usize) -> Self::Count {
             // SYNC: Write (we just read though)
+            Self::sync(rtc);
             rtc.mode0().comp(number).read().bits()
         }
 

@@ -29,21 +29,14 @@ impl EmbassyBackend {
         }
     }
 
+    /// Set an alarm for a certain amount of time in the future. 
+    /// Return `true` if we were able to set it, return `false` otherwise.
     fn set_alarm(&self, _cs: &CriticalSection, at: u64, rtc: &Rtc) -> bool {
         let t: u32 = RtcMode0::count(rtc);        
         
+        // TODO: We can't overflow at u32::MAX because that limits us to 36 hours of continuous operation :/
         let at = match u32::try_from(at) {
-            Ok(at) => {
-                // Alarm needs to be in the future, otherwise it won't fire.
-                // one tick is ~3 microseconds, so 30 microseconds seems 
-                // like a good amonut of buffer.
-                // TODO: analysis or timing evidence is required to prove why 0x9 is a good buffer value
-                if at.saturating_sub(t) > 0x9 {
-                    at
-                } else {
-                    return false;
-                }
-            },
+            Ok(at) => at,
             // Embassy uses u64::MAX as a "no upcoming interrupt" sentinel
             _ if at == u64::MAX => u32::MAX,
             Err(_) => return false,
@@ -90,10 +83,8 @@ impl EmbassyBackend {
 
 impl Driver for EmbassyBackend {
     fn now(&self) -> u64 {
-        critical_section::with(|_cs| {
-            let rtc = unsafe { Rtc::steal() };
-            RtcMode0::count(&rtc) as u64
-        })
+        let rtc = unsafe { Rtc::steal() };
+        RtcMode0::count(&rtc) as u64
     }
 
     fn schedule_wake(&self, at: u64, waker: &Waker) {
@@ -101,9 +92,16 @@ impl Driver for EmbassyBackend {
             let rtc = unsafe { Rtc::steal() };
             let mut queue = self.queue.borrow(cs).borrow_mut();
             if queue.schedule_wake(at, waker) {
-                let mut next = queue.next_expiration(self.now());
+
+                /// It takes us a nonzero amount of time to schedule a task for wakeup.
+                /// If a task wants to be woken up sooner than 9 ticks (~275us) into the future,
+                /// we'll just wake it up now.
+                const MIN_TIME_TO_SCHEDULE_TICKS: u64 = 0x9;
+
+                // Find the next task to schedule
+                let mut next = queue.next_expiration(self.now() + MIN_TIME_TO_SCHEDULE_TICKS);
                 while !self.set_alarm(&cs, next, &rtc) {
-                    next = queue.next_expiration(self.now());
+                    next = queue.next_expiration(self.now() + MIN_TIME_TO_SCHEDULE_TICKS);
                 }
             }
         });
