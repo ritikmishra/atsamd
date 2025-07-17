@@ -10,6 +10,7 @@ This crate provides a type-safe API for working with `samd11`, `samd21`, `samd51
 
 ## Supported Devices
 
+* `atsamd10c` (via the `samd10c` feature) [[pac]](https://github.com/atsamd-rs/atsamd/tree/master/pac/atsamd10c)
 * `atsamd11c` (via the `samd11c` feature) [[pac]](https://github.com/atsamd-rs/atsamd/tree/master/pac/atsamd11c)
 * `atsamd21e` (via the `samd21e` feature) [[pac]](https://github.com/atsamd-rs/atsamd/tree/master/pac/atsamd21e)
 * `atsamd21g` (via the `samd21g` feature) [[pac]](https://github.com/atsamd-rs/atsamd/tree/master/pac/atsamd21g)

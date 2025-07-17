@@ -43,7 +43,7 @@ impl watchdog::Watchdog for Watchdog {
 impl watchdog::WatchdogDisable for Watchdog {
     #[hal_macro_helper]
     fn disable(&mut self) {
-        #[hal_cfg(any("wdt-d11", "wdt-d21"))]
+        #[hal_cfg(any("wdt-d10", "wdt-d10", "wdt-d11", "wdt-d21"))]
         {
             // Disable the watchdog timer.
             self.wdt.ctrl().write(|w| w.enable().clear_bit());
@@ -80,7 +80,7 @@ impl watchdog::WatchdogEnable for Watchdog {
         self.wdt
             .config()
             .write(|w| unsafe { w.per().bits(period.into()) });
-        #[hal_cfg(any("wdt-d11", "wdt-d21"))]
+        #[hal_cfg(any("wdt-d10", "wdt-d10", "wdt-d11", "wdt-d21"))]
         {
             // Enable the watchdog timer.
             self.wdt.ctrl().write(|w| w.enable().set_bit());

@@ -296,7 +296,7 @@ impl From<Error> for crate::sercom::uart::Error {
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[cfg(feature = "max-channels")]
-#[hal_cfg("dmac-d11")]
+#[hal_cfg(any("dmac-d10", "dmac-d11"))]
 #[macro_export]
 macro_rules! with_num_channels {
     ($some_macro:ident) => {
@@ -323,7 +323,7 @@ macro_rules! with_num_channels {
 }
 
 #[cfg(not(feature = "max-channels"))]
-#[hal_cfg("dmac-d11")]
+#[hal_cfg(any("dmac-d10", "dmac-d11"))]
 #[macro_export]
 macro_rules! with_num_channels {
     ($some_macro:ident) => {

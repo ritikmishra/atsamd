@@ -7,7 +7,7 @@ use super::{BaudMode, BitOrder, CharSizeEnum, Flags, Oversampling, Parity, Statu
 use crate::pac;
 use crate::sercom::Sercom;
 
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 use pac::sercom0::usart::ctrla::Modeselect;
 
 #[hal_cfg("sercom0-d5x")]
@@ -31,7 +31,7 @@ impl<S: Sercom> Registers<S> {
     }
 
     /// Helper function to access the underlying `USART` from the given `SERCOM`
-    #[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+    #[hal_cfg(any("sercom0-d10", "sercom0-d10", "sercom0-d11", "sercom0-d21"))]
     #[inline]
     fn usart(&self) -> &pac::sercom0::Usart {
         self.sercom.usart()

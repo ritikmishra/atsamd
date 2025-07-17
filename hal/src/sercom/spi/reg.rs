@@ -2,12 +2,12 @@ use atsamd_hal_macros::{hal_cfg, hal_macro_helper};
 
 use crate::ehal;
 
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 use crate::pac::sercom0::Spi;
 #[hal_cfg("sercom0-d5x")]
 use crate::pac::sercom0::Spim;
 
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 use crate::pac::sercom0::spi::ctrla::Modeselect;
 #[hal_cfg("sercom0-d5x")]
 use crate::pac::sercom0::spim::ctrla::Modeselect;
@@ -36,7 +36,7 @@ pub(super) struct Registers<S: Sercom> {
 unsafe impl<S: Sercom> Sync for Registers<S> {}
 
 impl<S: Sercom> Registers<S> {
-    #[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+    #[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
     #[inline]
     pub fn spi(&self) -> &Spi {
         self.sercom.spi()
@@ -104,7 +104,7 @@ impl<S: Sercom> Registers<S> {
     }
 
     /// Set the character size
-    #[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+    #[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
     #[inline]
     pub fn set_char_size(&mut self, bits: u8) {
         self.spi()

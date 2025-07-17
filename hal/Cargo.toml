@@ -81,6 +81,7 @@ usb-device = {version = "0.3.2", optional = true}
 # users should specify a corresponding variant (see below). The variant features
 # will select the correct PAC, as well as other configuration features.
 
+atsamd10c = {version = "0.14.2", path = "../pac/atsamd10c", optional = true}
 atsamd11c = {version = "0.14.2", path = "../pac/atsamd11c", optional = true}
 atsamd11d = {version = "0.14.2", path = "../pac/atsamd11d", optional = true}
 
@@ -119,6 +120,7 @@ atsame54p = {version = "0.14.2", path = "../pac/atsame54p", optional = true}
 # to change. But all implied features are considered implementation details and
 # subject to change without notice.
 
+samd10c = ["device", "dep:atsamd10c"]
 samd11c = ["device", "dep:atsamd11c"]
 samd11d = ["device", "dep:atsamd11d"]
 
@@ -151,6 +153,7 @@ same54p = ["device", "dep:atsame54p"]
 # Instead of selecting a variant feature above, users can optionally select an
 # `-rt` feature, which enables the `rt` feature of the corresponding PAC.
 
+samd10c-rt = ["samd10c", "atsamd10c/rt"]
 samd11c-rt = ["samd11c", "atsamd11c/rt"]
 samd11d-rt = ["samd11d", "atsamd11d/rt"]
 

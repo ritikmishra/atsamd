@@ -37,7 +37,7 @@ impl From<u8> for ResetCause {
 }
 
 /// Returns the cause of the last reset.
-#[hal_cfg(any("pm-d11", "pm-d21"))]
+#[hal_cfg(any("pm-d10", "pm-d10", "pm-d11", "pm-d21"))]
 pub fn reset_cause(pm: &crate::pac::Pm) -> ResetCause {
     ResetCause::from(pm.rcause().read().bits())
 }

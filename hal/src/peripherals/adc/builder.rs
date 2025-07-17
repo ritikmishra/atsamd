@@ -3,10 +3,10 @@ use atsamd_hal_macros::hal_cfg;
 #[hal_cfg("adc-d5x")]
 use crate::pac::adc0;
 
-#[hal_cfg(any("adc-d21", "adc-d11"))]
+#[hal_cfg(any("adc-d21", "adc-d10", "adc-d11"))]
 use crate::pac::adc as adc0;
 
-#[hal_cfg(any("adc-d21", "adc-d11"))]
+#[hal_cfg(any("adc-d21", "adc-d10", "adc-d11"))]
 pub use adc0::ctrlb::Prescalerselect as Prescaler;
 
 #[hal_cfg("adc-d5x")]
@@ -257,7 +257,7 @@ impl AdcBuilder {
         Adc::new(adc, settings, clk, pclk).map_err(|e| e.into())
     }
 
-    #[hal_cfg(any("adc-d11", "adc-d21"))]
+    #[hal_cfg(any("adc-d10", "adc-d11", "adc-d21"))]
     #[inline]
     pub fn enable<I: AdcInstance>(
         self,

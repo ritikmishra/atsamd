@@ -439,13 +439,13 @@ use reg::Registers;
 // Chip-specific imports
 //=============================================================================
 
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 use crate::pac::sercom0::spi::ctrla::Modeselect;
 #[hal_cfg("sercom0-d5x")]
 use crate::pac::sercom0::spim::ctrla::Modeselect;
 
 #[hal_module(
-    any("sercom0-d11", "sercom0-d21") => "spi/pads_thumbv6m.rs",
+    any("sercom0-d10", "sercom0-d11", "sercom0-d21") => "spi/pads_thumbv6m.rs",
     "sercom0-d5x" => "spi/pads_thumbv7em.rs",
 )]
 pub mod pads {}
@@ -453,25 +453,25 @@ pub mod pads {}
 pub use pads::*;
 
 #[hal_module(
-    any("sercom0-d11", "sercom0-d21") => "spi/char_size.rs",
+    any("sercom0-d10", "sercom0-d11", "sercom0-d21") => "spi/char_size.rs",
     "sercom0-d5x" => "spi/length.rs",
 )]
 pub mod size {}
 
 #[cfg(doc)]
-#[hal_cfg(not(any("sercom0-d11", "sercom0-d21")))]
+#[hal_cfg(not(any("sercom0-d10", "sercom0-d11", "sercom0-d21")))]
 /// This type is not present with the selected feature set, defined for
 /// documentation only
 pub enum NineBit {}
 
 #[cfg(doc)]
-#[hal_cfg(not(any("sercom0-d11", "sercom0-d21")))]
+#[hal_cfg(not(any("sercom0-d10", "sercom0-d11", "sercom0-d21")))]
 /// This type is not present with the selected feature set, defined for
 /// documentation only
 pub enum EightBit {}
 
 #[cfg(doc)]
-#[hal_cfg(not(any("sercom0-d11", "sercom0-d21")))]
+#[hal_cfg(not(any("sercom0-d10", "sercom0-d11", "sercom0-d21")))]
 /// This trait is not present with the selected feature set, defined for
 /// documentation only
 pub trait CharSize {
@@ -666,7 +666,7 @@ impl MasterMode for MasterHWSS {}
 //=============================================================================
 
 /// Type alias for the width of the `DATA` register
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 pub type DataWidth = u16;
 
 /// Type alias for the width of the `DATA` register
@@ -676,14 +676,14 @@ pub type DataWidth = u32;
 /// Trait alias whose definition varies by chip
 ///
 /// On SAMD11 and SAMD21 chips, this represents the [`CharSize`].
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 pub trait Size: CharSize {}
 
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 impl<C: CharSize> Size for C {}
 
 /// Type alias for the default [`Size`] type, which varies by chip
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 pub type DefaultSize = EightBit;
 
 /// Trait alias whose definition varies by chip
@@ -707,7 +707,7 @@ pub type DefaultSize = typenum::U1;
 /// read or write of the `DATA` register
 pub trait AtomicSize: Size {}
 
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 impl<C: CharSize> AtomicSize for C {}
 
 #[hal_cfg("sercom0-d5x")]
@@ -819,7 +819,7 @@ impl<P: ValidPads> Config<P> {
         regs.reset();
         regs.set_op_mode(Master::MODE, Master::MSSEN);
         regs.set_dipo_dopo(P::DIPO_DOPO);
-        #[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+        #[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
         regs.set_char_size(EightBit::BITS);
         #[hal_cfg("sercom0-d5x")]
         regs.set_length(1);
@@ -842,7 +842,7 @@ impl<P: ValidPads> Config<P> {
             /// configuration. The default [`OpMode`] is [`Master`], while the default
             /// [`Size`] is an
         }
-        any("sercom0-d11", "sercom0-d21") => {
+        any("sercom0-d10", "sercom0-d11", "sercom0-d21") => {
             /// [`EightBit`] [`CharSize`]
         }
         "sercom0-d5x" => {
@@ -851,7 +851,7 @@ impl<P: ValidPads> Config<P> {
         {
             /// for SAMD11 and SAMD21 chips or a
         }
-        any("sercom0-d11", "sercom0-d21") => {
+        any("sercom0-d10", "sercom0-d11", "sercom0-d21") => {
             /// `Length` of `U1`
         }
         "sercom0-d5x" => {
@@ -934,7 +934,7 @@ where
     }
 
     /// Change the [`CharSize`] using the builder pattern
-    #[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+    #[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
     #[inline]
     pub fn char_size<C2: CharSize>(mut self) -> Config<P, M, C2> {
         self.regs.set_char_size(C2::BITS);

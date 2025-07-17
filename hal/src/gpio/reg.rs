@@ -1,6 +1,6 @@
 use atsamd_hal_macros::{hal_cfg, hal_macro_helper};
 
-#[hal_cfg(any("port-d11", "port-d21"))]
+#[hal_cfg(any("port-d10", "port-d10", "port-d11", "port-d21"))]
 use crate::pac::port::{
     Ctrl, Dir, Dirclr, Dirset, Dirtgl, In, Out, Outclr, Outset, Outtgl, Pincfg0_ as Pincfg,
     Pmux0_ as Pmux, Wrconfig,

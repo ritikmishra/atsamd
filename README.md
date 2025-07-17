@@ -12,6 +12,7 @@ The Hardware Abstraction Layer (HAL - [![Crates.io](https://img.shields.io/crate
 
 | Chip family | Documented features               |
 |:------------|:----------------------------------|
+| [samd10c]   | samd10c dma defmt async           |
 | [samd11c]   | samd11c dma defmt async           |
 | [samd11d]   | samd11d dma defmt async           |
 | [samd21g]   | samd21g usb dma defmt async       |
@@ -21,6 +22,7 @@ The Hardware Abstraction Layer (HAL - [![Crates.io](https://img.shields.io/crate
 | [samd51n]   | samd51n usb sdmmc dma defmt async |
 | [samd51p]   | samd51p usb sdmmc dma defmt async |
 
+[samd10c]: https://atsamd-rs.github.io/atsamd/samd10c/thumbv6m-none-eabi/doc/atsamd_hal/index.html
 [samd11c]: https://atsamd-rs.github.io/atsamd/samd11c/thumbv6m-none-eabi/doc/atsamd_hal/index.html
 [samd11d]: https://atsamd-rs.github.io/atsamd/samd11d/thumbv6m-none-eabi/doc/atsamd_hal/index.html
 [samd21g]: https://atsamd-rs.github.io/atsamd/samd21g/thumbv6m-none-eabi/doc/atsamd_hal/index.html
@@ -38,6 +40,7 @@ The Peripheral Access Crates (PACs) are automatically generated from Microchip S
 
 | PAC docs | crates.io | Provided BSPs  |
 |:---------|:----------|:---------------|
+| [atsamd10c](https://docs.rs/atsamd10c/) | [![Crates.io](https://img.shields.io/crates/v/atsamd10c.svg)](https://crates.io/crates/atsamd10c) |  |
 | [atsamd11c](https://docs.rs/atsamd11c/) | [![Crates.io](https://img.shields.io/crates/v/atsamd11c.svg)](https://crates.io/crates/atsamd11c) | [Bare atsamd11][samd11_bare]\* |
 | [atsamd21e](https://docs.rs/atsamd21e/) | [![Crates.io](https://img.shields.io/crates/v/atsamd21e.svg)](https://crates.io/crates/atsamd21e) | [Gemma M0][gemma_m0], [Serpente][serpente], [Trinket M0][trinket_m0], [Neo Trinkey][neo_trinkey], [NeoKey Trinkey][neokey_trinkey], [QT Py][qt_py_m0] |
 | [atsamd21g](https://docs.rs/atsamd21g/) | [![Crates.io](https://img.shields.io/crates/v/atsamd21g.svg)](https://crates.io/crates/atsamd21g) | [Arduino Nano 33 IOT][arduino_nano33_iot], [Circuit Playground Express][circuit_playground_express], [Feather M0][feather_m0]\*, [ItsyBitsy M0][itsybitsy_m0], [Metro M0][metro_m0]\*, [MKR1000][arduino_mkr1000], [MKR Vidor 4000][arduino_mkr_vidor_4000], [MKR ZERO][arduino_mkrzero], [P1AM-100][p1am_100], [SAMD21 Mini][samd21_mini], [SODAQ ONE][sodaq_one], [Wio Lite MG126][wio_lite_mg126], [Wio Lite W600][wio_lite_w600], [Xiao M0][xiao_m0] |

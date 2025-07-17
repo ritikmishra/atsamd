@@ -237,7 +237,7 @@ impl GenericClockController {
         set_flash_manual_write(nvmctrl);
 
         // Get rid of unused warning
-        #[hal_cfg("clock-d11")]
+        #[hal_cfg(any("clock-d10", "clock-d11"))]
         let _ = nvmctrl;
 
         enable_gclk_apb(pm);
@@ -405,6 +405,28 @@ impl GenericClockController {
     }
 }
 
+// samd10
+#[hal_cfg("clock-d10")]
+clock_generator!(
+    (tcc0, Tcc0Clock, Tcc0),
+    (tc1_tc2, Tc1Tc2Clock, Tc1Tc2),
+    (sercom0_core, Sercom0CoreClock, Sercom0Core),
+    (sercom1_core, Sercom1CoreClock, Sercom1Core),
+    (sercom2_core, Sercom2CoreClock, Sercom2Core),
+    (rtc, RtcClock, Rtc),
+    (adc, AdcClock, Adc),
+    (wdt, WdtClock, Wdt),
+    (eic, EicClock, Eic),
+    (evsys0, Evsys0Clock, Evsys0),
+    (evsys1, Evsys1Clock, Evsys1),
+    (evsys2, Evsys2Clock, Evsys2),
+    (evsys3, Evsys3Clock, Evsys3),
+    (evsys4, Evsys4Clock, Evsys4),
+    (evsys5, Evsys5Clock, Evsys5),
+    (ac_ana, AcAnaClock, AcAna),
+    (ac_dig, AcDigClock, AcDig),
+    (dac, DacClock, Dac),
+);
 // samd11
 #[hal_cfg("clock-d11")]
 clock_generator!(

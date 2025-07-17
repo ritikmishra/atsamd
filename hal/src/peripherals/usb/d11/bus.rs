@@ -509,7 +509,7 @@ impl UsbBus {
 }
 
 impl Inner {
-    #[hal_cfg("usb-d11")]
+    #[hal_cfg(any("usb-d10", "usb-d11"))]
     fn usb(&self) -> &Device {
         unsafe { (*Usb::ptr()).device() }
     }
@@ -554,7 +554,7 @@ impl Inner {
             w.trim().bits(usb_trim_cal())
         });
 
-        #[hal_cfg("usb-d11")]
+        #[hal_cfg(any("usb-d10", "usb-d11"))]
         usb.qosctrl().modify(|_, w| unsafe {
             w.dqos().bits(0b11);
             w.cqos().bits(0b11)

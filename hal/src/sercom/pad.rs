@@ -44,7 +44,7 @@ use crate::gpio::{AnyPin, OptionalPin, Pin, PinId, PinMode};
 use crate::typelevel::{NoneT, Sealed};
 
 #[hal_module(
-    any("sercom0-d11", "sercom0-d21") => "pad/impl_pad_thumbv6m.rs",
+    any("sercom0-d10", "sercom0-d11", "sercom0-d21") => "pad/impl_pad_thumbv6m.rs",
     "sercom0-d5x" => "pad/impl_pad_thumbv7em.rs",
 )]
 mod impl_pad {}
@@ -166,7 +166,7 @@ impl<P: IsPad> SomePad for P {}
 /// See the documentation on [type-level functions] for more details.
 ///
 /// [type-level functions]: crate::typelevel#type-level-functions
-#[hal_cfg("sercom0-d11")]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
 pub trait GetPad<S, N>
 where
     S: Sercom,
@@ -206,7 +206,7 @@ where
 
 /// Type alias using [`GetPad`] to recover the [`PinMode`] for a given SERCOM
 /// pad
-#[hal_cfg("sercom0-d11")]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
 pub type PadMode<S, N, I> = <I as GetPad<S, N>>::PinMode;
 
 /// Type alias using [`GetPad`] to recover the [`PinMode`] for a given SERCOM
@@ -216,7 +216,7 @@ pub type PadMode<S, I> = <I as GetPad<S>>::PinMode;
 
 /// Type alias to recover a [`Pin`] configured as a SERCOM pad in the correct
 /// [`PadMode`]
-#[hal_cfg("sercom0-d11")]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
 pub type Pad<S, N, I> = Pin<I, PadMode<S, N, I>>;
 
 /// Type alias to recover a [`Pin`] configured as a SERCOM pad in the correct

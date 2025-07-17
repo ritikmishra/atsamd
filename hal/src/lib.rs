@@ -30,6 +30,7 @@ macro_rules! define_pac {
 }
 
 define_pac!(
+    (atsamd10c, "samd10c"),
     (atsamd11c, "samd11c"),
     (atsamd11d, "samd11d"),
     (atsamd21e, "samd21e"),

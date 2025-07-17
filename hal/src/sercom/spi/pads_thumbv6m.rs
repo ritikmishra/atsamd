@@ -214,7 +214,7 @@ where
     }
 }
 
-#[hal_cfg("sercom0-d11")]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
 impl<S, DI, DO, CK, SS> Pads<S, DI, DO, CK, SS>
 where
     S: Sercom,

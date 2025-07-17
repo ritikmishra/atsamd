@@ -121,17 +121,17 @@ macro_rules! declare_multiple_interrupts {
 declare_multiple_interrupts!(DMAC: [DMAC_0, DMAC_1, DMAC_2, DMAC_OTHER]);
 
 #[cfg(feature = "dma")]
-#[hal_cfg(any("dmac-d11", "dmac-d21"))]
+#[hal_cfg(any("dmac-d10", "dmac-d10", "dmac-d11", "dmac-d21"))]
 declare_interrupts!(DMAC);
 
 // ----------  SERCOM Interrupts ---------- //
-#[hal_cfg(any("sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d10", "sercom0-d10", "sercom0-d11", "sercom0-d21"))]
 declare_interrupts!(SERCOM0);
 
-#[hal_cfg(any("sercom1-d11", "sercom1-d21"))]
+#[hal_cfg(any("sercom1-d10", "sercom1-d10", "sercom1-d11", "sercom1-d21"))]
 declare_interrupts!(SERCOM1);
 
-#[hal_cfg(any("sercom2-d11", "sercom2-d21"))]
+#[hal_cfg(any("sercom2-d10", "sercom2-d10", "sercom2-d11", "sercom2-d21"))]
 declare_interrupts!(SERCOM2);
 
 #[hal_cfg("sercom3-d21")]
@@ -194,7 +194,7 @@ declare_interrupts!(TC6);
 declare_interrupts!(TC7);
 
 // ----------  EIC Interrupt ---------- //
-#[hal_cfg(any("eic-d11", "eic-d21"))]
+#[hal_cfg(any("eic-d10", "eic-d10", "eic-d11", "eic-d21"))]
 declare_interrupts!(EIC);
 
 #[hal_cfg("eic-d5x")]
@@ -212,7 +212,7 @@ seq_macro::seq!(N in 0..= 15 {
 declare_multiple_interrupts!(ADC0: [ADC0_RESRDY, ADC0_OTHER]);
 #[hal_cfg("adc-d5x")]
 declare_multiple_interrupts!(ADC1: [ADC1_RESRDY, ADC1_OTHER]);
-#[hal_cfg(any("adc-d11", "adc-d21"))]
+#[hal_cfg(any("adc-d10", "adc-d10", "adc-d11", "adc-d21"))]
 declare_interrupts!(ADC);
 /// An interrupt source that may have one or many interrupt bindings.
 ///

@@ -23,7 +23,7 @@ where
     scl: SCL,
 }
 
-#[hal_cfg("sercom0-d11")]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
 impl<S, DI, CI> PadsFromIds<S, DI, CI>
 where
     S: Sercom,
@@ -109,7 +109,7 @@ where
 ///
 /// [`Pin`]: crate::gpio::Pin
 /// [`PinId`]: crate::gpio::PinId
-#[hal_cfg("sercom0-d11")]
+#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
 pub type PadsFromIds<S, SDA, SCL> = Pads<S, Pad<S, Pad0, SDA>, Pad<S, Pad1, SCL>>;
 
 /// Define a set of [`Pads`] using [`PinId`]s instead of [`Pin`]s

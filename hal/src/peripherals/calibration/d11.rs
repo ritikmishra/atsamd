@@ -72,7 +72,7 @@ pub fn usb_transp_cal() -> u8 {
 }
 
 /// USB TRIM calibration value. Should be written to USB PADCAL register.
-#[hal_cfg("nvmctrl-d11")]
+#[hal_cfg(any("nvmctrl-d10", "nvmctrl-d11"))]
 pub fn usb_trim_cal() -> u8 {
     cal_with_errata(6, 7, 0b111, 7, 5) as u8
 }

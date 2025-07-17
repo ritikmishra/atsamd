@@ -26,7 +26,7 @@ use core::marker::PhantomData;
 use modular_bitfield::prelude::*;
 use seq_macro::seq;
 
-#[hal_cfg(any("dmac-d11", "dmac-d21"))]
+#[hal_cfg(any("dmac-d10", "dmac-d10", "dmac-d11", "dmac-d21"))]
 pub use crate::pac::dmac::chctrlb::{
     Lvlselect as PriorityLevel, Trigactselect as TriggerAction, Trigsrcselect as TriggerSource,
 };
@@ -164,7 +164,7 @@ impl DmaController {
     #[hal_macro_helper]
     pub fn init(mut dmac: Dmac, _pm: &mut Pm) -> Self {
         // ----- Initialize clocking ----- //
-        #[hal_cfg(any("dmac-d11", "dmac-d21"))]
+        #[hal_cfg(any("dmac-d10", "dmac-d10", "dmac-d11", "dmac-d21"))]
         {
             // Enable clocking
             _pm.ahbmask().modify(|_, w| w.dmac_().set_bit());
@@ -216,7 +216,7 @@ impl DmaController {
 
         Self::swreset(&mut self.dmac);
 
-        #[hal_cfg(any("dmac-d11", "dmac-d21"))]
+        #[hal_cfg(any("dmac-d10", "dmac-d10", "dmac-d11", "dmac-d21"))]
         {
             // Disable the DMAC clocking
             _pm.apbbmask().modify(|_, w| w.dmac_().clear_bit());
@@ -337,7 +337,7 @@ where
 
         Self::swreset(&mut self.dmac);
 
-        #[hal_cfg(any("dmac-d11", "dmac-d21"))]
+        #[hal_cfg(any("dmac-d10", "dmac-d10", "dmac-d11", "dmac-d21"))]
         {
             // Disable the DMAC clocking
             _pm.apbbmask().modify(|_, w| w.dmac_().clear_bit());

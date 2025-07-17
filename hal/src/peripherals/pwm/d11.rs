@@ -290,6 +290,8 @@ impl $crate::ehal_02::Pwm for $TYPE {
 
 )+}}
 
+#[hal_cfg("tcc0-d10")]
+pwm_tcc! { Pwm0: (Tcc0, Tcc0Clock, apbcmask, tcc0_, Pwm0Wrapper) }
 #[hal_cfg("tcc0-d11")]
 pwm_tcc! { Pwm0: (Tcc0, Tcc0Clock, apbcmask, tcc0_, Pwm0Wrapper) }
 #[hal_cfg("tcc0-d21")]
