@@ -180,7 +180,7 @@ mod backends;
 
 #[hal_cfg("rtc-d5x")]
 use super::modes::{RtcMode, mode0::RtcMode0};
-#[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+#[hal_cfg(any("rtc-d1x", "rtc-d21"))]
 use super::modes::{RtcMode, mode1::RtcMode1};
 use crate::interrupt::{NVIC_PRIO_BITS, Priority};
 use atsamd_hal_macros::hal_cfg;
@@ -233,7 +233,7 @@ impl RtcModeMonotonic for RtcMode0 {
     const HALF_PERIOD: Self::Count = 0x8000_0000;
     const MIN_COMPARE_TICKS: Self::Count = 8;
 }
-#[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+#[hal_cfg(any("rtc-d1x", "rtc-d21"))]
 impl RtcModeMonotonic for RtcMode1 {
     const HALF_PERIOD: Self::Count = 0x8000;
     const MIN_COMPARE_TICKS: Self::Count = 8;
@@ -243,10 +243,10 @@ mod backend {
     use super::*;
 
     // For SAMD11/21 chips mode 1 is the only sensible option
-    #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+    #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
     use crate::rtc::modes::mode1::{Compare0, Compare1, Overflow};
 
-    #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+    #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
     crate::__internal_half_period_counting_backend!(
         RtcBackend, RtcMode1, 1, Compare0, Compare1, Overflow
     );

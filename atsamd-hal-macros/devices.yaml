@@ -12,33 +12,9 @@ pin-groups:
   pins-128: ["pins-100", "pb26", "pb27", "pb28", "pb29", "pc04", "pc22", "pc23", "pc30", "pc31", "pd00", "pd01", "pd08", "pd09", "pd10", "pd11", "pd12", "pd20", "pd21"]
 
 families:
-  d10:
+  d1x:
     pins:
       samd10c: ["pins-14", "pa28"]
-    peripherals:
-      - nvic
-      - serial-numbers
-      - dsu
-      - clock
-      - gclk
-      - pm
-      - sysctrl
-      - wdt
-      - rtc
-      - dmac
-      - eic
-      - nvmctrl
-      - port
-      - evsys
-      - sercom: { count: 2, only: ["samd10c"] }
-      - tc: { start: 1, count: 2 }
-      - tcc: { count: 1 }
-      - adc
-      - ac
-      - dac
-      - ptc
-  d11:
-    pins:
       samd11c: ["pins-14", "pa28"]
       samd11d: ["pins-24", "pa27", "pa28"]
     peripherals:
@@ -56,11 +32,12 @@ families:
       - nvmctrl
       - port
       - evsys
+      - sercom: { count: 2, only: ["samd10c"] }
       - sercom: { count: 2, only: ["samd11c"] }
       - sercom: { count: 3, only: ["samd11d"] }
       - tc: { start: 1, count: 2 }
       - tcc: { count: 1 }
-      - usb
+      - usb: { only: ["samd11c", "samd11d"]}
       - adc
       - ac
       - dac

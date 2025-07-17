@@ -30,7 +30,7 @@ use pac::Peripherals;
 use crate::{gpio::AnyPin, pac, typelevel::Sealed};
 
 #[hal_module(
-    any("adc-d10", "adc-d11", "adc-d21") => "d11/mod.rs",
+    any("adc-d1x", "adc-d21") => "d11/mod.rs",
     "adc-d5x" => "d5x/mod.rs",
 )]
 mod impls {}
@@ -45,7 +45,7 @@ pub use async_api::*;
 mod builder;
 pub use builder::*;
 
-#[hal_cfg(any("adc-d10", "adc-d11", "adc-d21"))]
+#[hal_cfg(any("adc-d1x", "adc-d21"))]
 use crate::pac::adc as adc0;
 #[hal_cfg("adc-d5x")]
 use crate::pac::adc0;
@@ -62,7 +62,7 @@ const ADC_SETTINGS_INTERNAL_READ: AdcSettings = AdcSettings {
 };
 
 /// Based on Temperature log row information (NVM)x
-#[hal_cfg(any("adc-d21", "adc-d10", "adc-d11"))]
+#[hal_cfg(any("adc-d1x"))]
 const ADC_SETTINGS_INTERNAL_READ_D21_TEMP: AdcSettings = AdcSettings {
     clk_divider: Prescaler::Div64,
     sample_clock_cycles: 32,
@@ -104,7 +104,7 @@ pub enum CpuVoltageSource {
 }
 
 /// Voltage source to use when using the ADC to measure the CPU voltage
-#[hal_cfg(any("adc-d21", "adc-d10", "adc-d11"))]
+#[hal_cfg(any("adc-d1x"))]
 #[derive(Copy, Clone, PartialEq, Eq)]
 #[repr(u8)]
 pub enum CpuVoltageSource {
@@ -145,7 +145,7 @@ pub trait AdcInstance {
 
     fn peripheral_reg_block(p: &mut Peripherals) -> &adc0::RegisterBlock;
 
-    #[hal_cfg(any("adc-d10", "adc-d11", "adc-d21"))]
+    #[hal_cfg(any("adc-d1x", "adc-d21"))]
     fn enable_pm(pm: &mut pac::Pm);
 
     fn calibrate(instance: &Self::Instance);
@@ -163,7 +163,7 @@ where
 }
 
 /// ADC Instance
-#[hal_cfg(any("adc-d10", "adc-d11", "adc-d21"))]
+#[hal_cfg(any("adc-d1x", "adc-d21"))]
 pub struct Adc<I: AdcInstance> {
     adc: I::Instance,
     cfg: AdcSettings,
@@ -240,7 +240,7 @@ impl<I: AdcInstance> Adc<I> {
     /// This function will return [Error::ClockTooFast] if the clock source
     /// provided is faster than 48 MHz, since this is the maximum frequency
     /// for the ADC as per the datasheet.
-    #[hal_cfg(any("adc-d10", "adc-d11", "adc-d21"))]
+    #[hal_cfg(any("adc-d1x", "adc-d21"))]
     #[inline]
     pub(crate) fn new(
         adc: I::Instance,
@@ -413,7 +413,7 @@ impl<I: AdcInstance> Adc<I> {
     }
 
     /// Return the underlying ADC PAC object.
-    #[hal_cfg(any("adc-d10", "adc-d11", "adc-d21"))]
+    #[hal_cfg(any("adc-d1x", "adc-d21"))]
     #[inline]
     pub fn free(mut self) -> I::Instance {
         self.software_reset();

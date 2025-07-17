@@ -75,7 +75,7 @@ use crate::{
 };
 
 #[hal_module(
-    any("eic-d10", "eic-d10", "eic-d11", "eic-d21") => "eic/d11/mod.rs",
+    any("eic-d1x", "eic-d21") => "eic/d11/mod.rs",
     "eic-d5x" => "eic/d5x/mod.rs",
 )]
 mod impls {}
@@ -207,7 +207,7 @@ pub struct Eic<I = NoneT> {
 
 impl Eic {
     /// Create a new [`Eic`] and initialize it.
-    #[hal_cfg(any("eic-d10", "eic-d10", "eic-d11", "eic-d21"))]
+    #[hal_cfg(any("eic-d1x", "eic-d21"))]
     pub fn new(pm: &mut pac::Pm, _clock: EicClock, eic: pac::Eic) -> Self {
         pm.apbamask().modify(|_, w| w.eic_().set_bit());
 
@@ -293,7 +293,7 @@ impl Eic {
     }
 
     #[cfg(all(doc, feature = "async"))]
-    #[hal_cfg(not(any("eic-d10", "eic-d10", "eic-d11", "eic-d21")))]
+    #[hal_cfg(not(any("eic-d1x", "eic-d21")))]
     /// This method is not present with the selected feature set, defined for
     /// documentation only
     pub fn into_future(self) {
@@ -317,7 +317,7 @@ impl<F> Eic<F> {
     /// Reset the EIC
     #[atsamd_hal_macros::hal_macro_helper]
     fn swreset(&mut self) {
-        #[hal_cfg(any("eic-d10", "eic-d10", "eic-d11", "eic-d21"))]
+        #[hal_cfg(any("eic-d1x", "eic-d21"))]
         let ctrl = self.eic.ctrl();
 
         #[hal_cfg("eic-d5x")]
@@ -344,7 +344,7 @@ impl Eic<EicFuture> {
     }
 }
 
-#[hal_cfg(any("eic-d10", "eic-d11"))]
+#[hal_cfg(any("eic-d1x"))]
 macro_rules! with_num_channels {
     ($some_macro:ident) => {
         $some_macro! {8}

@@ -70,7 +70,7 @@ adc_pins! {
     PA11: (Adc0, 19),
 }
 
-#[hal_cfg(any("adc-d10", "adc-d11"))]
+#[hal_cfg(any("adc-d1x"))]
 adc_pins! {
     #[hal_cfg("pa02")]
     PA02: (Adc0, 0),

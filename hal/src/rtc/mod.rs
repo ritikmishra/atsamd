@@ -29,7 +29,7 @@ pub mod rtic;
 use crate::pac::{Mclk as Pm, rtc::mode0::ctrla::Prescalerselect};
 
 // SAMD11/SAMD21 imports
-#[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+#[hal_cfg(any("rtc-d1x", "rtc-d21"))]
 use crate::pac::{Pm, rtc::mode0::ctrl::Prescalerselect};
 
 pub use modes::mode2::Datetime;

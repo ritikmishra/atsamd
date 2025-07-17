@@ -279,7 +279,7 @@ mod async_impls {
 // and SAMD21-specific declarations.
 
 // SAMD11
-#[hal_cfg(any("eic-d10", "eic-d11"))]
+#[hal_cfg(any("eic-d1x"))]
 mod impls {
     use super::*;
 

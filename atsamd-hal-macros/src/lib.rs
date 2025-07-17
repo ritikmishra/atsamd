@@ -16,10 +16,10 @@
 //! - A peripheral from `devices.yaml` in the form of a string. Examples:
 //!   `"serial-numbers"` or `"sercom3"`.
 //! - A peripheral from `devices.yaml` suffixed with the device family.
-//!   Examples: `"serial-numbers-d11"` or `"sercom3-d5x"`
+//!   Examples: `"serial-numbers-d1x"` or `"sercom3-d5x"`
 //! - A pin from `devices.yaml`. Examples: `"pb22"`.
 //! - An expression of the form `any([peripheral expression], ...)`. Example:
-//!   `any("pm-d10", "pm-d11", "pm-d21", "rstc-d5x")`.
+//!   `any("pm-d1x", "pm-d21", "rstc-d5x")`.
 //! - An expression of the form `all([peripheral expression], ...)`. Example:
 //!   `all("tc4", "tc5")`.
 //! - An expression of the form `not([peripheral expression])`. Example:
@@ -68,7 +68,7 @@ fn hal_cfg_impl(args: TokenStream) -> Result<Group, Error> {
 ///
 /// ```ignore
 /// #[hal_module(
-///     any("nvmctrl-d10", "nvmctrl-d11", "nvmctrl-d21") => "calibration/d11.rs",
+///     any("nvmctrl-d1x", "nvmctrl-d21") => "calibration/d11.rs",
 ///     "nvmctrl-d5x" => "calibration/d5x.rs",
 /// )]
 /// pub mod calibration {}

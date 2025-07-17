@@ -2,7 +2,7 @@
 use atsamd_hal_macros::hal_cfg;
 
 use crate::pac::Pm;
-#[hal_cfg(any("tc1-d10", "tc1-d11"))]
+#[hal_cfg(any("tc1-d1x"))]
 use crate::pac::{tc1::Count16 as Count16Reg, Tc1};
 #[hal_cfg("tc3-d21")]
 use crate::pac::{tc3::Count16 as Count16Reg, Tc3, Tc4, Tc5};
@@ -135,7 +135,7 @@ impl TimerCounter<$TC>
 }
 
 // samd11
-#[hal_cfg(any("tc1-d10", "tc1-d11"))]
+#[hal_cfg(any("tc1-d1x"))]
 tc! {
     TimerCounter1: (Tc1, tc1_, Tc1Tc2Clock),
 }

@@ -44,7 +44,7 @@ use crate::pac::Tc5;
 
 use timer::{Count16, TimerCounter};
 
-#[hal_cfg(any("tc1-d10", "tc1-d11"))]
+#[hal_cfg(any("tc1-d1x"))]
 type RegBlock = pac::tc1::RegisterBlock;
 
 #[hal_cfg("tc3-d21")]
@@ -118,7 +118,7 @@ macro_rules! impl_async_count16 {
     };
 }
 
-#[hal_cfg(any("tc1-d10", "tc1-d11"))]
+#[hal_cfg(any("tc1-d1x"))]
 impl_async_count16!(Tc1, 0);
 
 #[hal_cfg("tc3-d21")]
@@ -145,7 +145,7 @@ impl_async_count16!(Tc5, 3);
 // Reserve space for the max number of timer peripherals based on chip type,
 // even though some wakers may not be used on some chips if they actually don't
 // exist on variant's hardware
-#[hal_cfg(any("tc1-d10", "tc1-d11"))]
+#[hal_cfg(any("tc1-d1x"))]
 const NUM_TIMERS: usize = 1;
 
 #[hal_cfg("tc3-d21")]

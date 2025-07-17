@@ -52,7 +52,7 @@ where
 
 /// Clock type needed to create a new [`Config`]. [`Pm`](pac::Pm) for thumbv6m
 /// targets.
-#[hal_cfg(any("sercom0-d10", "sercom0-d10", "sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d1x", "sercom0-d21"))]
 pub type Clock = pac::Pm;
 
 /// Clock type needed to create a new [`Config`]. [`Mclk`](pac::Mclk) for

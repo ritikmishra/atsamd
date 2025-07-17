@@ -37,7 +37,7 @@ use pac::sercom0;
 
 #[hal_cfg("sercom0-d5x")]
 use pac::Mclk as ApbClkCtrl;
-#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d1x", "sercom0-d21"))]
 use pac::Pm as ApbClkCtrl;
 
 #[cfg(feature = "dma")]
@@ -115,7 +115,7 @@ macro_rules! sercom {
                 const DMA_TX_TRIGGER: TriggerSource = TriggerSource::[< Sercom $N Tx >];
 
                 #[cfg(feature = "async")]
-                #[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
+                #[hal_cfg(any("sercom0-d1x", "sercom0-d21"))]
                 type Interrupt = $crate::async_hal::interrupts::[< SERCOM $N >];
 
                 #[cfg(feature = "async")]
@@ -139,13 +139,13 @@ macro_rules! sercom {
 }
 
 // d11 and d21 families
-#[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
+#[hal_cfg(any("sercom0-d1x", "sercom0-d21"))]
 sercom!(apbcmask, 0);
 
-#[hal_cfg(any("sercom1-d10", "sercom1-d11", "sercom1-d21"))]
+#[hal_cfg(any("sercom1-d1x", "sercom1-d21"))]
 sercom!(apbcmask, 1);
 
-#[hal_cfg(any("sercom2-d11", "sercom2-d21"))]
+#[hal_cfg(any("sercom2-d1x", "sercom2-d21"))]
 sercom!(apbcmask, 2);
 
 #[hal_cfg("sercom3-d21")]
@@ -185,7 +185,7 @@ sercom!(apbdmask, 7);
 // Reserve space for the max number of SERCOM peripherals based on chip type,
 // even though some wakers may not be used on some chips if they actually don't
 // exist on variant's hardware
-#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
+#[hal_cfg(any("sercom0-d1x"))]
 #[cfg(feature = "async")]
 const NUM_SERCOM: usize = 3;
 

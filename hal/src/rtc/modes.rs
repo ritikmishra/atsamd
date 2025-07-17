@@ -34,7 +34,7 @@ use atsamd_hal_macros::{hal_cfg, hal_macro_helper};
 use pac::Rtc;
 
 // Import prescaler divider enum
-#[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+#[hal_cfg(any("rtc-d1x", "rtc-d21"))]
 use crate::pac::rtc::mode0::ctrl::Prescalerselect;
 #[hal_cfg("rtc-d5x")]
 use crate::pac::rtc::mode0::ctrla::Prescalerselect;
@@ -143,7 +143,7 @@ pub trait RtcMode {
     fn sync_busy(rtc: &Rtc) -> bool {
         // NOTE: This register and field are the same in all modes.
         // SYNC: None
-        #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+        #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
         return rtc.mode0().status().read().syncbusy().bit_is_set();
         // SYNC: None
         #[hal_cfg("rtc-d5x")]
@@ -162,14 +162,14 @@ pub trait RtcMode {
         // NOTE: This register and field are the same in all modes.
         // SYNC: Write
         Self::sync(rtc);
-        #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+        #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
         rtc.mode0().ctrl().modify(|_, w| w.swrst().set_bit());
         #[hal_cfg("rtc-d5x")]
         rtc.mode0().ctrla().modify(|_, w| w.swrst().set_bit());
 
         // Wait for the reset to complete
         // SYNC: Write (we just read though)
-        #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+        #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
         while rtc.mode0().ctrl().read().swrst().bit_is_set() {}
         #[hal_cfg("rtc-d5x")]
         // NOTE: There is also a SWRST bit in the SYNCBUSY register but the bit CTRLA register
@@ -187,7 +187,7 @@ pub trait RtcMode {
     fn set_prescaler(rtc: &Rtc, divider: Prescalerselect) {
         // NOTE: This register and field are the same in all modes.
         // SYNC: None
-        #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+        #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
         rtc.mode0()
             .ctrl()
             .modify(|_, w| w.prescaler().variant(divider));
@@ -295,7 +295,7 @@ pub trait RtcMode {
         // NOTE: This register and field are the same in all modes.
         // SYNC: Write
         Self::sync(rtc);
-        #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+        #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
         rtc.mode0().ctrl().modify(|_, w| w.enable().clear_bit());
         #[hal_cfg("rtc-d5x")]
         rtc.mode0().ctrla().modify(|_, w| w.enable().clear_bit());
@@ -313,7 +313,7 @@ pub trait RtcMode {
         // SYNC: Write
         Self::sync(rtc);
 
-        #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+        #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
         rtc.mode0().ctrl().modify(|_, w| w.enable().set_bit());
         #[hal_cfg("rtc-d5x")]
         rtc.mode0().ctrla().modify(|_, w| w.enable().set_bit());
@@ -371,7 +371,7 @@ pub mod mode0 {
         #[hal_macro_helper]
         pub fn set_match_clear(rtc: &Rtc, enable: bool) {
             // SYNC: None
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             rtc.mode0().ctrl().modify(|_, w| w.matchclr().bit(enable));
             #[hal_cfg("rtc-d5x")]
             rtc.mode0().ctrla().modify(|_, w| w.matchclr().bit(enable));
@@ -386,7 +386,7 @@ pub mod mode0 {
         fn set_mode(rtc: &Rtc) {
             // NOTE: This register and field are the same in all modes.
             // SYNC: None (for these bits)
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             rtc.mode0().ctrl().modify(|_, w| w.mode().count32());
             #[hal_cfg("rtc-d5x")]
             rtc.mode0().ctrla().modify(|_, w| w.mode().count32());
@@ -411,7 +411,7 @@ pub mod mode0 {
         #[inline]
         #[hal_macro_helper]
         fn count(rtc: &Rtc) -> Self::Count {
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             {
                 // Request syncing of the COUNT register.
                 // SYNC: None
@@ -433,7 +433,7 @@ pub mod mode0 {
 }
 
 /// Interface for using the RTC in MODE1 (16-bit COUNT)
-#[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+#[hal_cfg(any("rtc-d1x", "rtc-d21"))]
 #[cfg(feature = "rtic")]
 pub mod mode1 {
     use super::*;
@@ -456,7 +456,7 @@ pub mod mode1 {
             // SYNC: Write
             Self::sync(rtc);
             // NOTE: This register and field are the same in all modes.
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             rtc.mode0().ctrl().modify(|_, w| w.mode().count16());
             #[hal_cfg("rtc-d5x")]
             rtc.mode0().ctrla().modify(|_, w| w.mode().count16());
@@ -484,7 +484,7 @@ pub mod mode1 {
         #[inline]
         #[hal_macro_helper]
         fn count(rtc: &Rtc) -> Self::Count {
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             {
                 // Request syncing of the COUNT register.
                 // SYNC: None
@@ -543,7 +543,7 @@ pub mod mode2 {
     }
 
     from_reg_datetime!(clock);
-    #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+    #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
     from_reg_datetime!(alarm);
     #[hal_cfg("rtc-d5x")]
     from_reg_datetime!(alarm0);
@@ -583,7 +583,7 @@ pub mod mode2 {
             // SYNC: Write
             Self::sync(rtc);
             // NOTE: This register and field are the same in all modes.
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             rtc.mode0().ctrl().modify(|_, w| w.mode().clock());
             #[hal_cfg("rtc-d5x")]
             rtc.mode0().ctrla().modify(|_, w| w.mode().clock());
@@ -595,7 +595,7 @@ pub mod mode2 {
             // SYNC: Write
             Self::sync(rtc);
 
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             rtc.mode2().alarm(0).write(|w| write_datetime!(w, value));
             #[hal_cfg("rtc-d5x")]
             if _number == 0 {
@@ -610,7 +610,7 @@ pub mod mode2 {
         #[cfg(feature = "rtic")]
         fn get_compare(rtc: &Rtc, _number: usize) -> Self::Count {
             // SYNC: Write (we just read though)
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             return rtc.mode2().alarm(0).read().into();
             #[hal_cfg("rtc-d5x")]
             if _number == 0 {
@@ -623,7 +623,7 @@ pub mod mode2 {
         #[inline]
         #[hal_macro_helper]
         fn count(rtc: &Rtc) -> Self::Count {
-            #[hal_cfg(any("rtc-d10", "rtc-d11", "rtc-d21"))]
+            #[hal_cfg(any("rtc-d1x", "rtc-d21"))]
             {
                 // Request syncing of the COUNT register.
                 // SYNC: None

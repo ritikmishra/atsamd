@@ -36,7 +36,7 @@ impl<S: Sercom> Handler<S::Interrupt> for InterruptHandler<S> {
         unsafe {
             let mut peripherals = crate::pac::Peripherals::steal();
 
-            #[hal_cfg(any("sercom0-d10", "sercom0-d11", "sercom0-d21"))]
+            #[hal_cfg(any("sercom0-d1x", "sercom0-d21"))]
             let spi = S::reg_block(&mut peripherals).spi();
             #[hal_cfg("sercom0-d5x")]
             let spi = S::reg_block(&mut peripherals).spim();

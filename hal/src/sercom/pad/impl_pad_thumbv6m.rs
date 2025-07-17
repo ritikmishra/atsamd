@@ -39,7 +39,7 @@ macro_rules! pad_info {
         $Sercom:ident,
         $PadNum:ident
     ) => {
-        #[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
+        #[hal_cfg(any("sercom0-d1x"))]
         impl GetPad<$Sercom, $PadNum> for $PinId {
             type PinMode = Alternate<$Cfg>;
         }
@@ -115,7 +115,7 @@ macro_rules! pad_table {
 }
 
 #[hal_macro_helper]
-#[hal_cfg(any("sercom0-d10", "sercom0-d11"))]
+#[hal_cfg(any("sercom0-d1x"))]
 pad_table!(
     #[hal_cfg("pa04")]
     PA04 {

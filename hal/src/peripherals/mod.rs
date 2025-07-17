@@ -4,13 +4,13 @@ use atsamd_hal_macros::{hal_cfg, hal_module};
 pub mod adc;
 
 #[hal_module(
-    any("nvmctrl-d10", "nvmctrl-d10", "nvmctrl-d11", "nvmctrl-d21") => "calibration/d11.rs",
+    any("nvmctrl-d1x", "nvmctrl-d21") => "calibration/d11.rs",
     "nvmctrl-d5x" => "calibration/d5x.rs",
 )]
 pub mod calibration {}
 
 #[hal_module(
-    any("clock-d10", "clock-d10", "clock-d11", "clock-d21") => "timer/d11.rs",
+    any("clock-d1x", "clock-d21") => "timer/d11.rs",
     "clock-d5x" => "timer/d5x.rs",
 )]
 pub mod timer {}
@@ -20,19 +20,19 @@ pub mod eic;
 
 #[cfg(feature = "usb")]
 #[hal_module(
-    any("usb-d10", "usb-d10", "usb-d11", "usb-d21") => "usb/d11/mod.rs",
+    any("usb-d1x", "usb-d21") => "usb/d11/mod.rs",
     "usb-d5x" => "usb/d5x/mod.rs",
 )]
 pub mod usb {}
 
 #[hal_module(
-    any("clock-d10", "clock-d10", "clock-d11", "clock-d21") => "pwm/d11.rs",
+    any("clock-d1x", "clock-d21") => "pwm/d11.rs",
     "clock-d5x" => "pwm/d5x.rs",
 )]
 pub mod pwm {}
 
 #[hal_module(
-    any("clock-d10", "clock-d10", "clock-d11", "clock-d21") => "clock/d11.rs",
+    any("clock-d1x", "clock-d21") => "clock/d11.rs",
     "clock-d5x" => "clock/d5x/mod.rs",
 )]
 pub mod clock {}
@@ -65,10 +65,10 @@ pub mod can {}
 #[hal_module("wdt")]
 pub mod watchdog {}
 
-#[hal_module(any("pm-d10", "pm-d10", "pm-d11", "pm-d21", "rstc-d5x"))]
+#[hal_module(any("pm-d1x", "pm-d21", "rstc-d5x"))]
 mod reset_cause {}
 
-#[hal_cfg(any("pm-d10", "pm-d10", "pm-d11", "pm-d21", "rstc-d5x"))]
+#[hal_cfg(any("pm-d1x", "pm-d21", "rstc-d5x"))]
 pub use reset_cause::*;
 
 #[hal_module("serial-numbers")]
