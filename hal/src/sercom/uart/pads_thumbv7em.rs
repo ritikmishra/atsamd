@@ -335,7 +335,7 @@ pub type PadsFromIds<S, RX = NoneT, TX = NoneT, RTS = NoneT, CTS = NoneT> = Pads
 /// [`Pin`]: crate::gpio::Pin
 /// [`Config`]: crate::sercom::uart::Config
 /// [type-level function]: crate::typelevel#type-level-functions
-pub trait PadSet: Sealed {
+pub trait PadSet {
     type Sercom: Sercom;
     type Rx: OptionalPad;
     type Tx: OptionalPad;
