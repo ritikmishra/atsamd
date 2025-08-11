@@ -38,7 +38,7 @@ use channel_regs::{
 };
 
 #[hal_cfg("dmac-d5x")]
-use pac::dmac::channel::{Chprilvl, chprilvl::ChprilvlSpec};
+use pac::dmac::channel::{Chprilvl, chprilvl::ChprilvlSpec, Chevctrl, chevctrl::ChevctrlSpec};
 
 //==============================================================================
 // RegisterBlock
@@ -266,6 +266,8 @@ reg_proxy!(chintflag, register, rw);
 reg_proxy!(chstatus, register, r);
 #[hal_cfg("dmac-d5x")]
 reg_proxy!(chprilvl, register, rw);
+#[hal_cfg("dmac-d5x")]
+reg_proxy!(chevctrl, register, rw);
 
 reg_proxy!(intstatus, bit, r);
 reg_proxy!(busych, bit, r);
@@ -293,6 +295,8 @@ pub struct RegisterBlock<Id: ChId> {
     pub swtrigctrl: SwtrigctrlProxy<Id, Swtrigctrl>,
     #[hal_cfg("dmac-d5x")]
     pub chprilvl: ChprilvlProxy<Id, Chprilvl>,
+    #[hal_cfg("dmac-d5x")]
+    pub chevctrl: ChevctrlProxy<Id, Chevctrl>,
 }
 
 impl<Id: ChId> RegisterBlock<Id> {
@@ -311,6 +315,8 @@ impl<Id: ChId> RegisterBlock<Id> {
             swtrigctrl: SwtrigctrlProxy::new(),
             #[hal_cfg("dmac-d5x")]
             chprilvl: ChprilvlProxy::new(),
+            #[hal_cfg("dmac-d5x")]
+            chevctrl: ChevctrlProxy::new(),
         }
     }
 }
