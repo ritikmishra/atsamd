@@ -264,13 +264,13 @@ impl<Id: ChId, S: Status> Channel<Id, S> {
     }
 
     #[inline]
-    fn _trigger_private(&mut self) {
+    fn trigger(&mut self) {
         self.regs.swtrigctrl.set_bit();
     }
 
     /// Enable the transfer, and emit a compiler fence.
     #[inline]
-    fn _enable_private(&mut self) {
+    pub fn enable(&mut self) {
         // Prevent the compiler from re-ordering read/write
         // operations beyond this fence.
         // (see https://docs.rust-embedded.org/embedonomicon/dma.html#compiler-misoptimizations)
@@ -280,7 +280,7 @@ impl<Id: ChId, S: Status> Channel<Id, S> {
 
     /// Stop transfer on channel whether or not the transfer has completed
     #[inline]
-    pub(crate) fn stop(&mut self) {
+    pub fn stop(&mut self) {
         self.regs.chctrla.modify(|_, w| w.enable().clear_bit());
 
         // Wait for the burst to finish
@@ -449,11 +449,11 @@ where
     ) {
         // Configure the trigger source and trigger action
         self.configure_trigger(trig_src, trig_act);
-        self._enable_private();
+        self.enable();
 
         // If trigger source is DISABLE, manually trigger transfer
         if trig_src == TriggerSource::Disable {
-            self._trigger_private();
+            self.trigger();
         }
     }
 
@@ -576,10 +576,10 @@ impl<Id: ChId> Channel<Id, Ready> {
         }
 
         self.configure_trigger(trig_src, trig_act);
-        self._enable_private();
+        self.enable();
 
         if trig_src == TriggerSource::Disable {
-            self._trigger_private();
+            self.trigger();
         }
     }
 }
@@ -589,7 +589,7 @@ impl<Id: ChId> Channel<Id, Busy> {
     /// Issue a software trigger to the channel
     #[inline]
     pub(crate) fn software_trigger(&mut self) {
-        self._trigger_private();
+        self.trigger();
     }
 
     /// Stop transfer on channel whether or not the transfer has completed, and
@@ -608,7 +608,7 @@ impl<Id: ChId> Channel<Id, Busy> {
     /// Restart transfer using previously-configured trigger source and action
     #[inline]
     pub(crate) fn restart(&mut self) {
-        self._enable_private();
+        self.enable();
     }
 }
 
@@ -782,11 +782,11 @@ mod transfer_future {
             use crate::dmac::waker::WAKERS;
             use core::task::Poll;
 
-            self.chan._enable_private();
+            self.chan.enable();
 
             if !self.triggered && self.trig_src == TriggerSource::Disable {
                 self.triggered = true;
-                self.chan._trigger_private();
+                self.chan.trigger();
             }
 
             let flags_to_check = InterruptFlags::new().with_tcmpl(true).with_terr(true);
