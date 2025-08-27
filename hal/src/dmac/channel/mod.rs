@@ -236,6 +236,11 @@ impl<Id: ChId, S: Status> Channel<Id, S> {
             .write(|w| unsafe { w.bits(flags.into()) });
     }
 
+    #[inline]
+    pub fn check_interrupts(&mut self) -> InterruptFlags {
+        InterruptFlags::from_bytes([self.regs.chintflag.read().bits()])
+    }
+
     /// Check the specified `flags`, clear then return any that were set
     #[inline]
     pub fn check_and_clear_interrupts(&mut self, flags: InterruptFlags) -> InterruptFlags {
@@ -723,7 +728,7 @@ impl<Id: ChId> Channel<Id, ReadyFuture> {
 
         self.configure_trigger(trig_src, trig_act);
 
-        transfer_future::TransferFuture::new(self, trig_src).await;
+        transfer_future::TransferFuture::new(self, trig_src).await
 
         // No need to defensively disable channel here; it's automatically stopped when
         // TransferFuture is dropped. Even though `stop()` is implicitly called
@@ -731,9 +736,6 @@ impl<Id: ChId> Channel<Id, ReadyFuture> {
         // this function is returned, because it emits the compiler fence which ensures
         // memory operations aren't reordered beyond the DMA transfer's bounds.
 
-        // TODO currently this will always return Ok(()) since we unconditionally clear
-        // ERROR
-        self.xfer_success()
     }
 }
 
@@ -752,6 +754,7 @@ mod transfer_future {
     /// behaviour.
     pub(super) struct TransferFuture<'a, Id: ChId> {
         triggered: bool,
+        enabled: bool,
         trig_src: TriggerSource,
         chan: &'a mut Channel<Id, ReadyFuture>,
     }
@@ -760,6 +763,7 @@ mod transfer_future {
         pub(super) fn new(chan: &'a mut Channel<Id, ReadyFuture>, trig_src: TriggerSource) -> Self {
             Self {
                 triggered: false,
+                enabled: false,
                 trig_src,
                 chan,
             }
@@ -773,7 +777,7 @@ mod transfer_future {
     }
 
     impl<Id: ChId> core::future::Future for TransferFuture<'_, Id> {
-        type Output = ();
+        type Output = Result<(), super::Error>;
 
         fn poll(
             mut self: core::pin::Pin<&mut Self>,
@@ -782,7 +786,11 @@ mod transfer_future {
             use crate::dmac::waker::WAKERS;
             use core::task::Poll;
 
-            self.chan.enable();
+            
+            if !self.enabled {
+                self.enabled = true;
+                self.chan.enable();
+            }
 
             if !self.triggered && self.trig_src == TriggerSource::Disable {
                 self.triggered = true;
@@ -791,20 +799,30 @@ mod transfer_future {
 
             let flags_to_check = InterruptFlags::new().with_tcmpl(true).with_terr(true);
 
-            if self.chan.check_and_clear_interrupts(flags_to_check).tcmpl() {
-                return Poll::Ready(());
+            let flags = self.chan.check_interrupts();
+            if flags.tcmpl() {
+                self.chan.check_and_clear_interrupts(InterruptFlags::new().with_tcmpl(true));
+                return Poll::Ready(Ok(()));
+            } else if flags.terr() {
+                return Poll::Ready(Err(super::Error::TransferError));
             }
 
             WAKERS[Id::USIZE].register(cx.waker());
             self.chan.enable_interrupts(flags_to_check);
 
-            if self.chan.check_and_clear_interrupts(flags_to_check).tcmpl() {
-                self.chan.disable_interrupts(flags_to_check);
+            let flags = self.chan.check_interrupts();
+            let ret_val = if flags.tcmpl() {
+                self.chan.check_and_clear_interrupts(InterruptFlags::new().with_tcmpl(true));
+                Ok(())
+            } else if flags.terr() {
+                Err(super::Error::TransferError)
+            } else {
+                return Poll::Pending;
+            };
 
-                return Poll::Ready(());
-            }
+            self.chan.disable_interrupts(flags_to_check);
 
-            Poll::Pending
+            Poll::Ready(ret_val)
         }
     }
 }
