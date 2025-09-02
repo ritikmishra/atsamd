@@ -789,7 +789,7 @@ mod transfer_future {
                 self.chan.trigger();
             }
 
-            let flags_to_check = InterruptFlags::new().with_tcmpl(true).with_terr(true);
+            let flags_to_check = InterruptFlags::new().with_tcmpl(true);
 
             if self.chan.check_and_clear_interrupts(flags_to_check).tcmpl() {
                 return Poll::Ready(());
