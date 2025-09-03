@@ -44,6 +44,8 @@ use super::{
     sram::{self, DmacDescriptor},
     transfer::{BufferPair, Transfer},
 };
+#[cfg(feature = "async")]
+use crate::dmac::channel::transfer_future::TransferFuture;
 use crate::typelevel::{Is, Sealed};
 use modular_bitfield::prelude::*;
 
@@ -655,20 +657,19 @@ impl<Id: ChId> Channel<Id, ReadyFuture> {
     /// [`Future`]: core::future::Future
     /// [`poll`]: core::future::Future::poll
     #[inline]
-    pub async fn transfer_future<S, D>(
+    pub fn transfer_future<S, D>(
         &mut self,
         mut source: S,
         mut dest: D,
         trig_src: TriggerSource,
         trig_act: TriggerAction,
-    ) -> Result<(), super::Error>
+    ) -> TransferFuture<'_, Id>
     where
         S: super::Buffer,
         D: super::Buffer<Beat = S::Beat>,
     {
         unsafe {
             self.transfer_future_linked(&mut source, &mut dest, trig_src, trig_act, None)
-                .await
         }
     }
 
@@ -692,21 +693,22 @@ impl<Id: ChId> Channel<Id, ReadyFuture> {
     /// * Additionnally, this function doesn't take `'static` buffers. Again,
     ///   you must guarantee that the returned transfer has completed or has
     ///   been stopped before giving up control of the underlying [`Channel`].
-    pub(crate) async unsafe fn transfer_future_linked<S, D>(
+    pub(crate) unsafe fn transfer_future_linked<S, D>(
         &mut self,
         source: &mut S,
         dest: &mut D,
         trig_src: TriggerSource,
         trig_act: TriggerAction,
         linked_descriptor: Option<&mut DmacDescriptor>,
-    ) -> Result<(), super::Error>
+    ) -> TransferFuture<'_, Id>
     where
         S: super::Buffer,
         D: super::Buffer<Beat = S::Beat>,
     {
-        super::Transfer::<Self, super::transfer::BufferPair<S, D>>::check_buffer_pair(
-            source, dest,
-        )?;
+        // TODO readd in check?
+        // super::Transfer::<Self, super::transfer::BufferPair<S, D>>::check_buffer_pair(
+        //     source, dest,
+        // )?;
         unsafe {
             self.fill_descriptor(source, dest, false);
             if let Some(next) = linked_descriptor {
@@ -723,7 +725,7 @@ impl<Id: ChId> Channel<Id, ReadyFuture> {
 
         self.configure_trigger(trig_src, trig_act);
 
-        transfer_future::TransferFuture::new(self, trig_src).await
+        transfer_future::TransferFuture::new(self, trig_src)
 
         // No need to defensively disable channel here; it's automatically stopped when
         // TransferFuture is dropped. Even though `stop()` is implicitly called
@@ -734,7 +736,7 @@ impl<Id: ChId> Channel<Id, ReadyFuture> {
 }
 
 #[cfg(feature = "async")]
-mod transfer_future {
+pub(crate) mod transfer_future {
     use super::*;
 
     /// [`Future`](core::future::Future) which starts, then waits on a DMA
@@ -746,7 +748,7 @@ mod transfer_future {
     /// [`transfer_future`](super::Channel::transfer_future) method. This way we
     /// can stop transfers when they are dropped, thus avoiding undefined
     /// behaviour.
-    pub(super) struct TransferFuture<'a, Id: ChId> {
+    pub(crate) struct TransferFuture<'a, Id: ChId> {
         triggered: bool,
         trig_src: TriggerSource,
         chan: &'a mut Channel<Id, ReadyFuture>,
@@ -759,6 +761,10 @@ mod transfer_future {
                 trig_src,
                 chan,
             }
+        }
+
+        pub fn enable(&mut self) {
+            self.chan.enable();
         }
     }
 

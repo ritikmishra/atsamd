@@ -333,7 +333,7 @@ mod dma {
                 let sercom_ptr = self.i2c.sercom_ptr();
                 let mut bytes = SharedSliceBuffer::from_slice(bytes);
 
-                write_dma_linked::<_, _, S>(
+                write_dma_linked::<_, _, S, _>(
                     &mut self.i2c._dma_channel,
                     sercom_ptr,
                     &mut bytes,
@@ -364,7 +364,7 @@ mod dma {
                 self.i2c.prepare_read_linked(address, buffer, &next)?;
                 let i2c_ptr = self.i2c.sercom_ptr();
 
-                read_dma_linked::<_, _, S>(&mut self.i2c._dma_channel, i2c_ptr, &mut buffer, next)
+                read_dma_linked::<_, _, S, _>(&mut self.i2c._dma_channel, i2c_ptr, &mut buffer, next)
                     .await?;
             }
 
