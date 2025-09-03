@@ -1,23 +1,19 @@
+use core::{future::poll_fn, task::Poll};
+
 use embedded_hal_async::spi::SpiBus;
 use num_traits::{AsPrimitive, PrimInt};
 
 use super::SpiFuture;
 use crate::{
     dmac::{
-        AnyChannel, Beat, Buffer, ReadyFuture,
-        channel::{self, Channel},
-        sram::DmacDescriptor,
+        channel::{self, Channel}, sram::DmacDescriptor, AnyChannel, Beat, Buffer, ReadyFuture
     },
     sercom::{
-        Sercom,
         dma::{
-            SharedSliceBuffer, SinkSourceBuffer,
-            async_dma::{self, read_dma, read_dma_linked, write_dma, write_dma_linked},
-        },
-        spi::{
-            Capability, Config, DataWidth, Duplex, Error, MasterMode, OpMode, Receive, Rx, Size,
-            Slave, Spi, Transmit, Tx, ValidConfig, ValidPads, Word,
-        },
+            async_dma::{self, read_dma, read_dma_linked, write_dma, write_dma_linked}, SharedSliceBuffer, SinkSourceBuffer
+        }, spi::{
+            self, Capability, Config, DataWidth, Duplex, Error, Flags, MasterMode, OpMode, Receive, Rx, Size, Slave, Spi, Transmit, Tx, ValidConfig, ValidPads, Word
+        }, Sercom
     },
     typelevel::NoneT,
 };
@@ -240,27 +236,60 @@ where
         source: &mut Source,
     ) -> Result<(), Error> {
         let sercom_ptr = self.spi.sercom_ptr();
-        let rx = self.spi._rx_channel.as_mut();
-        let tx = self.spi._tx_channel.as_mut();
+        let rx_channel = self.spi._rx_channel.as_mut();
+        let tx_channel = self.spi._tx_channel.as_mut();
+        let config = &mut self.spi.config.regs;
+        config.enable_interrupts(Flags::ERROR);
 
-        let mut rx = read_dma::<_, _, S, _>(rx, sercom_ptr.clone(), dest);
-        let mut tx = write_dma::<_, _, S, _>(tx, sercom_ptr, source);
+        let mut rx_transfer = read_dma::<_, _, S, _>(rx_channel, sercom_ptr.clone(), dest);
+        let mut tx_transfer = write_dma::<_, _, S, _>(tx_channel, sercom_ptr, source);
 
-        rx.enable();
+        rx_transfer.enable();
         // TODO this is _probably_ not necessary? but want some way to try to guarantee that 
         // the receive was enabled first
         cortex_m::asm::dsb();
-        tx.enable();
+        tx_transfer.enable();
 
-        let transaction_result = futures::future::try_join(
-            rx,
-            tx
+        let transaction_result: futures::future::Either<_, _> = futures::future::select(
+                futures::future::try_join(
+                rx_transfer,
+                tx_transfer,
+            ),
+            poll_fn(|cx| {
+                // Check spi error flag
+                if let Err(e) = config.read_status().check_bus_error() {
+                    // If set, return the error
+                    Poll::Ready(e)
+                } else {
+                    // If not, enable error int in peripheral
+                    config.enable_interrupts(Flags::ERROR);
+                    S::error_waker().register(cx.waker());
+                    Poll::Pending
+                }
+            })
         ).await;
 
         // Check for overflows or DMA errors
-        self.spi.read_status().check_bus_error()?;
-        transaction_result?;
-        Ok(())
+        let mut result = Ok(());
+        match &transaction_result {
+            futures::future::Either::Left((transaction_result, _)) => {
+                (*transaction_result)?;
+            },
+            futures::future::Either::Right((spi_error, _)) => {
+                result = Err(*spi_error);
+            },
+        }
+        // Disable the DMAs
+        drop(transaction_result);
+
+        if result.is_err() {
+            // Clear error flags
+            // cortex_m::asm::bkpt();
+            config.clear_status(spi::Status::LENERR | spi::Status::BUFOVF);
+            config.clear_flags(spi::Flags::ERROR);
+        }
+
+        result
     }
 
     /// Read words into a buffer asynchronously, using DMA.
