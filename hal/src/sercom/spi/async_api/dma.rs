@@ -243,14 +243,14 @@ where
         let rx = self.spi._rx_channel.as_mut();
         let tx = self.spi._tx_channel.as_mut();
 
-        let (rx_result, tx_result) = futures::join!(
+        let transaction_result = futures::future::try_join(
             read_dma::<_, _, S>(rx, sercom_ptr.clone(), dest),
             write_dma::<_, _, S>(tx, sercom_ptr, source)
-        );
+        ).await;
 
         // Check for overflows or DMA errors
         self.spi.read_status().check_bus_error()?;
-        rx_result.and(tx_result)?;
+        transaction_result?;
         Ok(())
     }
 
@@ -377,16 +377,16 @@ where
         // SAFETY: We make sure that any DMA transfer is complete or stopped before
         // returning. The order of operations is important; the RX transfer
         // must be ready to receive before the TX transfer is initiated.
-        let (rx_result, tx_result) = unsafe {
-            futures::join!(
+        let transaction_result = unsafe {
+            futures::future::try_join(
                 read_dma_linked::<_, _, S>(rx, sercom_ptr.clone(), &mut read, read_link),
                 write_dma_linked::<_, _, S>(tx, sercom_ptr, &mut write, write_link)
-            )
+            ).await
         };
 
         // Check for overflows or DMA errors
         self.spi.read_status().check_bus_error()?;
-        rx_result.and(tx_result)?;
+        transaction_result?;
         Ok(())
     }
 
