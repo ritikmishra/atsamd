@@ -96,6 +96,12 @@ pub trait Sercom: Sealed + Deref<Target = sercom0::RegisterBlock> {
     fn tx_waker() -> &'static embassy_sync::waitqueue::AtomicWaker {
         &crate::sercom::async_api::TX_WAKERS[Self::NUM]
     }
+    /// Get a reference to this [`Sercom`]'s associated Error waker
+    #[cfg(feature = "async")]
+    #[inline]
+    fn error_waker() -> &'static embassy_sync::waitqueue::AtomicWaker {
+        &crate::sercom::async_api::ERROR_WAKERS[Self::NUM]
+    }
 }
 
 macro_rules! sercom {
@@ -208,4 +214,6 @@ pub(super) mod async_api {
     pub(super) static RX_WAKERS: [AtomicWaker; super::NUM_SERCOM] = [NEW_WAKER; super::NUM_SERCOM];
     /// Waker for a TX event.
     pub(super) static TX_WAKERS: [AtomicWaker; super::NUM_SERCOM] = [NEW_WAKER; super::NUM_SERCOM];
+    /// Waker for an error event.
+    pub(super) static ERROR_WAKERS: [AtomicWaker; super::NUM_SERCOM] = [NEW_WAKER; super::NUM_SERCOM];
 }

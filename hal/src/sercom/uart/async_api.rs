@@ -46,6 +46,10 @@ impl<S: Sercom> Handler<S::Interrupt> for InterruptHandler<S> {
             if (Flags::TX & enabled_flags).intersects(flags_pending) {
                 S::tx_waker().wake();
             }
+
+            if (Flags::ERROR & enabled_flags).intersects(flags_pending) {
+                S::error_waker().wake();
+            }
         }
     }
 }
