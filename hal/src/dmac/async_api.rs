@@ -93,7 +93,7 @@ impl Handler<DMAC> for InterruptHandler {
 
             if wake {
                 dmac.channel(channel).chctrla().modify(|_, w| {
-                    w.enable().clear_bit();
+                    // w.enable().clear_bit();
                     w.trigsrc().variant(TriggerSource::Disable)
                 });
                 WAKERS[channel].wake();

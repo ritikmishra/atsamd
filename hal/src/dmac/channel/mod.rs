@@ -278,6 +278,10 @@ impl<Id: ChId, S: Status> Channel<Id, S> {
         // (see https://docs.rust-embedded.org/embedonomicon/dma.html#compiler-misoptimizations)
         atomic::fence(atomic::Ordering::Release); // ▲
         self.regs.chctrla.modify(|_, w| w.enable().set_bit());
+
+        // while self.regs.chctrla.read().enable().bit_is_clear() {
+        //     core::hint::spin_loop();
+        // }   
     }
 
     /// Stop transfer on channel whether or not the transfer has completed
