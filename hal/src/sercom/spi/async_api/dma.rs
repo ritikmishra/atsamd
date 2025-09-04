@@ -244,11 +244,13 @@ where
         let mut rx_transfer = read_dma::<_, _, S, _>(rx_channel, sercom_ptr.clone(), dest);
         let mut tx_transfer = write_dma::<_, _, S, _>(tx_channel, sercom_ptr, source);
 
-        rx_transfer.enable();
-        // TODO this is _probably_ not necessary? but want some way to try to guarantee that 
-        // the receive was enabled first
-        cortex_m::asm::dsb();
-        tx_transfer.enable();
+        critical_section::with(|cs| {
+            rx_transfer.enable();
+            // TODO this is _probably_ not necessary? but want some way to try to guarantee that 
+            // the receive was enabled first
+            cortex_m::asm::dsb();
+            tx_transfer.enable();
+        });
 
         let transaction_result: futures::future::Either<_, _> = futures::future::select(
                 futures::future::try_join(
@@ -273,7 +275,9 @@ where
         let mut result = Ok(());
         match &transaction_result {
             futures::future::Either::Left((transaction_result, _)) => {
-                (*transaction_result)?;
+                if let Err(e) = *transaction_result {
+                    result = Err(spi::Error::Dma(e));
+                }
             },
             futures::future::Either::Right((spi_error, _)) => {
                 result = Err(*spi_error);
@@ -281,6 +285,7 @@ where
         }
         // Disable the DMAs
         drop(transaction_result);
+        config.disable_interrupts(Flags::ERROR);
 
         if result.is_err() {
             // Clear error flags
