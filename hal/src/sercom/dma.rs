@@ -375,21 +375,23 @@ pub(super) unsafe fn write_dma_linked<T, B, S>(
 pub(crate) mod async_dma {
     use dmac::{Error, ReadyFuture};
 
+    use crate::dmac::transfer_future::TransferFuture;
+
     use super::*;
 
     /// Perform a SERCOM DMA read with a provided `&mut [T]`
     #[inline]
-    pub(in super::super) async fn read_dma<T, B, S>(
-        channel: &mut impl AnyChannel<Status = ReadyFuture>,
+    pub(in super::super) fn read_dma<'ch, T, B, S, Ch: AnyChannel<Status=ReadyFuture>>(
+        channel: &'ch mut Ch,
         sercom_ptr: SercomPtr<T>,
         buf: &mut B,
-    ) -> Result<(), Error>
+    ) -> TransferFuture<'ch, <Ch as AnyChannel>::Id>
     where
         B: Buffer<Beat = T>,
         T: Beat,
         S: Sercom,
     {
-        unsafe { read_dma_linked::<_, _, S>(channel, sercom_ptr, buf, None).await }
+        unsafe { read_dma_linked::<_, _, S, _>(channel, sercom_ptr, buf, None) }
     }
 
     /// Perform a SERCOM DMA read with a provided [`Buffer`], and add an
@@ -402,12 +404,12 @@ pub(crate) mod async_dma {
     /// completed before giving back control of `channel` AND `buf`.
     #[inline]
     #[hal_macro_helper]
-    pub(in super::super) async unsafe fn read_dma_linked<T, B, S>(
-        channel: &mut impl AnyChannel<Status = ReadyFuture>,
+    pub(in super::super) unsafe fn read_dma_linked<'ch, T, B, S, Ch: AnyChannel<Status=ReadyFuture>>(
+        channel: &'ch mut Ch,
         mut sercom_ptr: SercomPtr<T>,
         buf: &mut B,
         next: Option<&mut DmacDescriptor>,
-    ) -> Result<(), Error>
+    ) -> TransferFuture<'ch, Ch::Id>
     where
         T: Beat,
         B: Buffer<Beat = T>,
@@ -431,23 +433,22 @@ pub(crate) mod async_dma {
                     trigger_action,
                     next,
                 )
-                .await
         }
     }
 
     /// Perform a SERCOM DMA write with a provided `&[T]`
     #[inline]
-    pub(in super::super) async fn write_dma<T, B, S>(
-        channel: &mut impl AnyChannel<Status = ReadyFuture>,
+    pub(in super::super) fn write_dma<'ch, T, B, S, Ch: AnyChannel<Status=ReadyFuture>>(
+        channel: &'ch mut Ch,
         sercom_ptr: SercomPtr<T>,
         buf: &mut B,
-    ) -> Result<(), Error>
+    ) -> TransferFuture<'ch, <Ch as AnyChannel>::Id>
     where
         B: Buffer<Beat = T>,
         T: Beat,
         S: Sercom,
     {
-        unsafe { write_dma_linked::<_, _, S>(channel, sercom_ptr, buf, None).await }
+        unsafe { write_dma_linked::<_, _, S, _>(channel, sercom_ptr, buf, None) }
     }
 
     /// Perform a SERCOM DMA write with a provided [`Buffer`], and add an
@@ -460,12 +461,12 @@ pub(crate) mod async_dma {
     /// completed before giving back control of `channel` AND `buf`.
     #[inline]
     #[hal_macro_helper]
-    pub(in super::super) async unsafe fn write_dma_linked<T, B, S>(
-        channel: &mut impl AnyChannel<Status = ReadyFuture>,
+    pub(in super::super) unsafe fn write_dma_linked<'ch, T, B, S, Ch:  AnyChannel<Status = ReadyFuture>>(
+        channel: &'ch mut Ch,
         mut sercom_ptr: SercomPtr<T>,
         buf: &mut B,
         next: Option<&mut DmacDescriptor>,
-    ) -> Result<(), Error>
+    ) -> TransferFuture<'ch, Ch::Id>
     where
         B: Buffer<Beat = T>,
         T: Beat,
@@ -489,7 +490,6 @@ pub(crate) mod async_dma {
                     trigger_action,
                     next,
                 )
-                .await
         }
     }
 }

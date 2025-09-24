@@ -208,7 +208,7 @@ where
         let tx = self.spi._tx_channel.as_mut();
         let mut buf = SharedSliceBuffer::from_slice(words);
 
-        let tx_result = async_dma::write_dma::<_, _, S>(tx, sercom_ptr, &mut buf).await;
+        let tx_result = async_dma::write_dma::<_, _, S, _>(tx, sercom_ptr, &mut buf).await;
 
         // Reenable receiver only if necessary
         if D::RX_ENABLE {
@@ -244,8 +244,8 @@ where
         let tx = self.spi._tx_channel.as_mut();
 
         let transaction_result = futures::future::try_join(
-            read_dma::<_, _, S>(rx, sercom_ptr.clone(), dest),
-            write_dma::<_, _, S>(tx, sercom_ptr, source)
+            read_dma::<_, _, S, _>(rx, sercom_ptr.clone(), dest),
+            write_dma::<_, _, S, _>(tx, sercom_ptr, source)
         ).await;
 
         // Check for overflows or DMA errors
@@ -379,8 +379,8 @@ where
         // must be ready to receive before the TX transfer is initiated.
         let transaction_result = unsafe {
             futures::future::try_join(
-                read_dma_linked::<_, _, S>(rx, sercom_ptr.clone(), &mut read, read_link),
-                write_dma_linked::<_, _, S>(tx, sercom_ptr, &mut write, write_link)
+                read_dma_linked::<_, _, S, _>(rx, sercom_ptr.clone(), &mut read, read_link),
+                write_dma_linked::<_, _, S, _>(tx, sercom_ptr, &mut write, write_link)
             ).await
         };
 
@@ -478,7 +478,7 @@ where
 
         // SAFETY: We make sure that any DMA transfer is complete or stopped before
         // returning.
-        let result = read_dma::<_, _, S>(rx, sercom_ptr.clone(), &mut buf).await;
+        let result = read_dma::<_, _, S, _>(rx, sercom_ptr.clone(), &mut buf).await;
 
         // Check for overflows or DMA errors
         self.flush_rx().await?;

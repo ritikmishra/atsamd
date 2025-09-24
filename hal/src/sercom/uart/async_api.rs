@@ -463,7 +463,7 @@ mod dma {
             // to &mut self as long as the transfer hasn't completed.
             let uart_ptr = self.uart.sercom_ptr();
 
-            read_dma::<_, _, S>(&mut self.uart.rx_channel, uart_ptr, &mut words).await?;
+            read_dma::<_, _, S, _>(&mut self.uart.rx_channel, uart_ptr, &mut words).await?;
             self.uart.read_status().check_bus_error()?;
             Ok(())
         }
@@ -500,7 +500,7 @@ mod dma {
             let uart_ptr = self.uart.sercom_ptr();
 
             let mut words = SharedSliceBuffer::from_slice(words);
-            write_dma::<_, _, S>(&mut self.uart.tx_channel, uart_ptr, &mut words).await?;
+            write_dma::<_, _, S, _>(&mut self.uart.tx_channel, uart_ptr, &mut words).await?;
             self.wait_flags(Flags::TXC).await;
             Ok(())
         }
