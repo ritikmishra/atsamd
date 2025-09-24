@@ -80,13 +80,13 @@ impl Handler<DMAC> for InterruptHandler {
                 // disable the interrupt. Flag will be cleared when polled
                 dmac.channel(channel)
                     .chintenclr()
-                    .modify(|_, w| w.tcmpl().set_bit());
+                    .write(|w| w.tcmpl().set_bit());
                 true
             } else if dmac.channel(channel).chintflag().read().terr().bit_is_set() {
                 // Transfer error
                 dmac.channel(channel)
                     .chintenclr()
-                    .modify(|_, w| w.terr().set_bit());
+                    .write(|w| w.terr().set_bit());
                 true
             } else {
                 false

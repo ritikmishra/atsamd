@@ -786,15 +786,18 @@ mod transfer_future {
             } else if triggered_flags.terr() {
                 Poll::Ready(Err(super::Error::TransferError))
             } else {
+                if !self.triggered {
+                    self.chan.enable();
+                    if self.trig_src == TriggerSource::Disable {
+                        self.chan.trigger();
+                    }    
+                    self.triggered = true;
+                }
+
+                // Only reenable interrupts after re-enabling/re-triggering the DMA channel
                 WAKERS[Id::USIZE].register(cx.waker());
                 self.chan.enable_interrupts(flags_to_check);
-                self.chan.enable();
-
-                if !self.triggered && self.trig_src == TriggerSource::Disable {
-                    self.triggered = true;
-                    self.chan.trigger();
-                }    
-
+                
                 Poll::Pending
             }
         }
