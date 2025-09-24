@@ -234,7 +234,7 @@ where
     T: AnyChannel<Status = ReadyFuture>,
 {
     #[inline]
-    async fn transfer_blocking<Source: Buffer<Beat = C::Word>, Dest: Buffer<Beat = C::Word>>(
+    pub async fn transfer_blocking<Source: Buffer<Beat = C::Word>, Dest: Buffer<Beat = C::Word>>(
         &mut self,
         dest: &mut Dest,
         source: &mut Source,
