@@ -77,7 +77,7 @@ impl Handler<DMAC> for InterruptHandler {
 #[hal_cfg("dmac-d5x")]
 impl InterruptHandler {
     #[inline(always)]
-    pub unsafe fn handle_dmac_ch(channel: usize) {
+    pub unsafe fn handle_dmac_ch(channel: usize) -> u8 {
         let dmac = unsafe { crate::pac::Peripherals::steal().dmac };
             
         let pending_channels = BitIter(dmac.intstatus().read().bits());
@@ -90,5 +90,7 @@ impl InterruptHandler {
             
             WAKERS[channel].wake();
         }
+
+        intflags
     }
 }
