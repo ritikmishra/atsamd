@@ -69,43 +69,12 @@ impl Handler<DMAC> for InterruptHandler {
 
         let pending_channels = BitIter(dmac.intstatus().read().bits());
         for channel in pending_channels.map(|c| c as usize) {
-            let wake = if dmac
-                .channel(channel)
-                .chintflag()
-                .read()
-                .tcmpl()
-                .bit_is_set()
-            {
-                // Transfer complete. Don't clear the flag, but
-                // disable the interrupt. Flag will be cleared when polled
-                dmac.channel(channel)
-                    .chintenclr()
-                    .write(|w| w.tcmpl().set_bit());
-                true
-            } else if dmac.channel(channel).chintflag().read().terr().bit_is_set() {
-                // Transfer error
-                dmac.channel(channel)
-                    .chintenclr()
-                    .write(|w| w.terr().set_bit());
-                true
-            } else {
-                false
-            };
+            let ch = dmac.channel(channel);
+            let intflags =  ch.chintflag().read().bits();
+            let wake = intflags > 0;
 
             if wake {
-                dmac.channel(channel).chctrla().modify(|_, w| {
-                    w.enable().clear_bit();
-                    w.trigsrc().variant(TriggerSource::Disable)
-                });
-
-                while dmac.channel(channel).chctrla().read().enable().bit_is_set() {
-                    core::hint::spin_loop();
-                }
-
-                // Prevent the compiler from re-ordering read/write
-                // operations beyond this fence.
-                // (see https://docs.rust-embedded.org/embedonomicon/dma.html#compiler-misoptimizations)
-                atomic::fence(atomic::Ordering::Acquire); // ▼
+                ch.chintenclr().write(|w| unsafe { w.bits(intflags) });
 
                 WAKERS[channel].wake();
             }
