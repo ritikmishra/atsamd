@@ -520,7 +520,7 @@ pub mod async_api;
 pub use async_api::*;
 
 #[cfg(feature = "async")]
-mod waker {
+pub mod waker {
     use embassy_sync::waitqueue::AtomicWaker;
 
     #[allow(clippy::declare_interior_mutable_const)]

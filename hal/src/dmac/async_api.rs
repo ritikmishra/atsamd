@@ -66,18 +66,29 @@ impl Handler<DMAC> for InterruptHandler {
 impl Handler<DMAC> for InterruptHandler {
     unsafe fn on_interrupt() {
         let dmac = unsafe { crate::pac::Peripherals::steal().dmac };
-
+        
         let pending_channels = BitIter(dmac.intstatus().read().bits());
         for channel in pending_channels.map(|c| c as usize) {
-            let ch = dmac.channel(channel);
-            let intflags =  ch.chintflag().read().bits();
-            let wake = intflags > 0;
+            Self::handle_dmac_ch(channel);
+        }
+    }
+}
 
-            if wake {
-                ch.chintenclr().write(|w| unsafe { w.bits(intflags) });
-
-                WAKERS[channel].wake();
-            }
+#[hal_cfg("dmac-d5x")]
+impl InterruptHandler {
+    #[inline(always)]
+    pub unsafe fn handle_dmac_ch(channel: usize) {
+        let dmac = unsafe { crate::pac::Peripherals::steal().dmac };
+            
+        let pending_channels = BitIter(dmac.intstatus().read().bits());
+        let ch = dmac.channel(channel);
+        let intflags =  ch.chintflag().read().bits();
+        let wake = intflags > 0;
+        
+        if wake {
+            ch.chintenclr().write(|w| unsafe { w.bits(intflags) });
+            
+            WAKERS[channel].wake();
         }
     }
 }
