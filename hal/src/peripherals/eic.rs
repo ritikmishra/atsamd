@@ -241,9 +241,9 @@ impl Eic {
         // Reset the EIC
         eic.swreset();
 
-        // Use the low-power 32k clock and enable.
+        // enable.
         eic.eic.ctrla().modify(|_, w| {
-            w.cksel().set_bit();
+            w.cksel().clk_gclk();
             w.enable().set_bit()
         });
 
