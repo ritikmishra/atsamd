@@ -526,6 +526,8 @@ pub struct ApbTokens {
     pub tc3: ApbToken<Tc3>,
     #[hal_cfg("tc4")]
     pub tc4: ApbToken<Tc4>,
+    #[hal_cfg("gmac")]
+    pub gmac: ApbToken<Gmac>,
     pub tcc2: ApbToken<Tcc2>,
     #[hal_cfg("tcc3")]
     pub tcc3: ApbToken<Tcc3>,
@@ -583,6 +585,8 @@ impl ApbTokens {
                 tc3: ApbToken::new(),
                 #[hal_cfg("tc4")]
                 tc4: ApbToken::new(),
+                #[hal_cfg("gmac")]
+                gmac: ApbToken::new(),
                 tcc2: ApbToken::new(),
                 #[hal_cfg("tcc3")]
                 tcc3: ApbToken::new(),
@@ -639,8 +643,6 @@ pub struct ApbClks {
     pub nvm_ctrl: ApbClk<NvmCtrl>,
     pub port: ApbClk<Port>,
     pub ram_ecc: ApbClk<RamEcc>,
-    #[hal_cfg("gmac")]
-    pub gmac: ApbClk<Gmac>,
     pub qspi: ApbClk<Qspi>,
 }
 
@@ -670,8 +672,6 @@ impl ApbClks {
                 nvm_ctrl: ApbClk::new(ApbToken::new()),
                 port: ApbClk::new(ApbToken::new()),
                 ram_ecc: ApbClk::new(ApbToken::new()),
-                #[hal_cfg("gmac")]
-                gmac: ApbClk::new(ApbToken::new()),
                 qspi: ApbClk::new(ApbToken::new()),
             }
         }
